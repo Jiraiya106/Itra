@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: first-task
+  labels:
+    env : prod
+    app : main
+    tier : frontend
+    owner : owner
+spec:
+  containers:
+  - name: container-task
+    image: crccheck/hello-world
+    # resources:
+    #   limits:
+    #     memory: "2gb"
+    #     cpu: "500m"
+    ports:
+      - containerPort: 80

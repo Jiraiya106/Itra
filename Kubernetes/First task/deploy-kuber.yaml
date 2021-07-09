@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deploy-kuber
+  namespace: first-task 
+  labels:
+    app: deploy-kuber
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: exp
+  template:
+    metadata:
+      labels:
+        app: exp
+    spec:
+      containers:
+      - name: exp-deploy
+        image: crccheck/hello-world
+        # resources:
+        #   limits:
+        #     memory: "128Mi"
+        #     cpu: "500m"
+        ports:
+        - containerPort: 80
