@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}
+  namespace: first-task 
+  labels:
+    app:  {{ .Release.Name }}-kuber
+spec:
+  replicas: {{ .Values.container.replicaCount }}
+  selector:
+    matchLabels:
+     app:  {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app:  {{ .Release.Name }}
+    spec:
+      containers:
+      - name:  {{ .Release.Name }}-deploy
+        image: {{ .Values.container.image}}
+        # resources:
+        #   limits:
+        #     memory: "128Mi"
+        #     cpu: "500m"
+        ports:
+        - containerPort: 80
+
+# ...
+# apiVersion: autoscaling/v1
+# kind: HorizontalPodAutoscaler
+# metadata:
+#   name: my-autoscaling
+#   spec:
+#     scaleTargetRef:
+#       apiVersion: apps/v1
+#       kind: Deployment
+#       name: my-deploy-autoscaling
+#     minReplicas: 3
+#     maxReplicas: 5
+#     metrics:
+#     - type: Resources
+#       resources:
+#         name: cpu
+#         targetAverangeUtilization: 70
+#     - type: Resources
+#       resources:
+#         name: memory
+#         targetAverangeUtilization: 80

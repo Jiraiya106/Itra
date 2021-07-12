@@ -1,0 +1,4 @@
+container:
+  image: crccheck/hello-world:latest
+
+  replicaCount: 2
