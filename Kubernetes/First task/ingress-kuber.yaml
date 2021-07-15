@@ -6,13 +6,13 @@ metadata:
     name: myingress
 spec:
   rules:
-  - host: www.elisey.net
+  - host: app.elisey.net
     http:
       paths:
       - pathType: Prefix
         path: "/"
         backend:
           service:
-            name: deploy-kuber
+            name: myapp-service
             port: 
               number: 80
