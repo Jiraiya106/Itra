@@ -1,0 +1,10 @@
+- hosts: all
+  tasks:
+  - name: "apt-get update"
+    apt:
+      update_cache: yes
+
+  - name: "install nginx"
+    apt:
+      name: nginx
+      state: latest
