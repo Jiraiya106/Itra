@@ -1,17 +1,11 @@
 ---
-- hosts: all
+  - name: Install required packages
+    apt: 
+      name: monit
+      update_cache: yes
 
-  tasks:
-    - name: Update apt cache
-      apt: update_cache=yes
+  - name: Copy config monit
+    copy:
+      src: ../files/monitrc
+      dest: /etc/monit
       sudo: yes
-
-    - name: Install required packages
-      apt: monit
-      sudo: yes
-
-    - name: Copy config monit
-      copy:
-        src: ../files/monitrc
-        dest: /etc/monit
-        sudo: yes

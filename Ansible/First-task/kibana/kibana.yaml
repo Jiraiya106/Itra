@@ -1,5 +1,7 @@
-- hosts: all
-  #become: yes
+---
+- name: Kibana
+  hosts: all
+  become: yes
   # gather_facts: yes
   roles:
     - { role: apt }

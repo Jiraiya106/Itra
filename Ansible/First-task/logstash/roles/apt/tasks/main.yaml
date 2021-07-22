@@ -1,14 +1,8 @@
 ---
-- hosts: all
+  - name: Update apt cache
+    apt: 
+      update_cache: yes
 
-  tasks:
-    - name: Update apt cache
-      apt: update_cache=yes
-      sudo: yes
-
-    - name: Install required packages
-      apt: name={{ item }}
-      sudo: yes
-      with_items:
-        - nginx
-        - postgresql
+  - name: Install required packages
+    apt: 
+      name: httpd

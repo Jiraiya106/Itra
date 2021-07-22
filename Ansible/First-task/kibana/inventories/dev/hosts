@@ -1,6 +1,7 @@
 
 [all]
-localhost ansible_port=22 ansible_user=vagrant ansible_password=vagrant ansible_become_password=vagrant
+localhost ansible_port=2222 ansible_user=vagrant ansible_ssh_private_key_file=/home/vagrant/.ssh/authorized_keys
+#ansible_become_password=vagrant
 
 [vagrant]
 #localhost ansible_port=1122

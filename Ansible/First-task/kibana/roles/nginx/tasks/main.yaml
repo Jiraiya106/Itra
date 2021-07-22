@@ -1,15 +1,10 @@
-- hosts: all
-  vars:
-    app_for_install: "nginx"
+---
+  - name: Install app
+    apt:
+      name: "nginx"
+      state: latest
 
-  tasks:
-
-    - name: Install app
-      yum:
-        name: "{{ app_for_install }}"
-        state: latest
-
-    - name: Start app
-      service:
-        name: "{{ app_for_install }}"
-        state: started
+  - name: Start app
+    service:
+      name: "nginx"
+      state: started

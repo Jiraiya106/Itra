@@ -1,44 +1,40 @@
-- hosts: all
-  gather_facts: no
-
-  tasks:
-    - name: Download Logstash Deb Package
-      get_url:
-        url: https://artifacts.elastic.co/downloads/logstash/logstash-7.13.4.deb
-        dest: /tmp
+  - name: Download Logstash Deb Package
+    get_url:
+      url: https://artifacts.elastic.co/downloads/logstash/logstash-7.13.4.deb
+      dest: /tmp
     
-    - name: Install Logstash Deb Package
-      become: yes
-      apt:
-        deb: /tmp/logstash-7.13.4.deb
+  - name: Install Logstash Deb Package
+    become: yes
+    apt:
+      deb: /tmp/logstash-7.13.4.deb
 
-    - name: Create Logstash Pipeline File
-      become: yes
-      file:
-         path: /etc/logstash/conf.d/main.conf
-         state: touch
+  - name: Create Logstash Pipeline File
+    become: yes
+    file:
+      path: /etc/logstash/conf.d/main.conf
+      state: touch
 
-    - name: Add Logstash Pipeline Configuration
-      become: yes
-      blockinfile:
-         path: /etc/logstash/conf.d/main.conf
-         marker: ""
-         block: |
-           input {
-             beats {
-               port => 5044
-             }
-           }
-           output {
-             elasticsearch {
-                cluster => "logstash" 
-                hosts => ["127.0.0.1:9200"]
-             }
-           }
+  - name: Add Logstash Pipeline Configuration
+    become: yes
+    blockinfile:
+      path: /etc/logstash/conf.d/main.conf
+      marker: ""
+      block: |
+        input {
+          beats {
+            port => 5044
+          }
+        }
+        output {
+          elasticsearch {
+            cluster => "logstash" 
+            hosts => ["127.0.0.1:9200"]
+          }
+        }
 
-    - name: Start Logstash Service
-      become: yes
-      service:
-        name: logstash
-        state: started
-        enabled: yes
+  - name: Start Logstash Service
+    become: yes
+    service:
+      name: logstash
+      state: started
+      enabled: yes

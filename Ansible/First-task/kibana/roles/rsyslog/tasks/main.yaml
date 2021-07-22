@@ -1,17 +1,11 @@
 ---
-- hosts: all
+  - name: Install and update required packages
+    apt: 
+      name: rsyslog
+      update_cache: yes
 
-  tasks:
-    - name: Update apt cache
-      apt: update_cache=yes
+  - name: Copy config rsyslog
+    copy:
+      src: ../files/rsyslog.conf
+      dest: /etc/rsyslog.conf
       sudo: yes
-
-    - name: Install required packages
-      apt: rsyslog
-      sudo: yes
-
-    - name: Copy config rsyslog
-      copy:
-        src: ../files/rsyslog.conf
-        dest: /etc/rsyslog.conf
-        sudo: yes
