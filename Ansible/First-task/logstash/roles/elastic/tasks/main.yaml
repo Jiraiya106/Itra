@@ -4,19 +4,19 @@
   tasks:
     - name: Download Elastic Deb Package
       get_url:
-        url: https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.6.2-amd64.deb
+        url: https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.13.4-amd64.deb
         dest: /tmp
 
     - name: Install Elastic Deb Package
       become: yes
       apt:
-        deb: /tmp/elasticsearch-7.6.2-amd64.deb
+        deb: /tmp/elasticsearch-7.13.4-amd64.deb
     
     - name: Update Elastic Config (IP Address to 0.0.0.0)
       become: yes
       lineinfile:
         destfile: /etc/elasticsearch/elasticsearch.yml
-        regexp: 'network.host'
+        regexp: '#network.host: 192.168.0.1'
         line: 'network.host: 0.0.0.0'
     
     - name: Updating Elastic Config (Port Number)
@@ -30,17 +30,19 @@
       become: yes
       lineinfile:
         destfile: /etc/elasticsearch/elasticsearch.yml
-        regexp: '#node.name: node-1'
-        line: 'node.name: node-1'
+        regexp: '#cluster.name: my-application'
+        line: 'cluster.name: logstash'
       
     - name: Updating Elastic Config (Cluster Initial Master Nodes)
       become: yes
       lineinfile:
         destfile: /etc/elasticsearch/elasticsearch.yml
-        line: 'cluster.initial_master_nodes: ["node-1"]'   
+        regexp: '#discovery.seed_hosts: ["host1", "host2"]'
+        line: 'discovery.seed_hosts: ["127.0.0.1", "[::1]"]'   
      
-    - name: Start ElasticSearch Service
+    - name: Start and Enabled ElasticSearch Service
       become: yes
       service:
         name: elasticsearch
         state: started
+        enabled: yes
