@@ -4,6 +4,15 @@
       name: "nginx"
       state: latest
 
+  - name: Config Nginx
+    copy:
+      src: files/kibana.conf
+      dest: /etc/nginx/conf.d/
+      mode: 0644
+      owner: root 
+      group: root
+    notify: restart nginx
+
   - name: Start app
     service:
       name: "nginx"

@@ -1,26 +1,26 @@
-  - name: Download Kibana Deb Package
-    get_url:
-      url: https://artifacts.elastic.co/downloads/kibana/kibana-7.13.4-amd64.deb
-      dest: /tmp
+  # - name: Download Kibana Deb Package
+  #   get_url:
+  #     url: https://artifacts.elastic.co/downloads/kibana/kibana-7.13.4-amd64.deb
+  #     dest: /tmp
 
   - name: Install Kibana Deb Package
     become: yes
     apt:
-      deb: /tmp/kibana-7.13.4-amd64.deb
+      deb: https://artifacts.elastic.co/downloads/kibana/kibana-7.13.4-amd64.deb
   
   - name: Update Kibana Config (Port)
     become: yes
     lineinfile:
       destfile: /etc/kibana/kibana.yml
       regexp: '#server.port: 5601'
-      line: 'server.port: 514'
+      line: 'server.port: 5601'
 
   - name: Update Kibana Config (IP Address)
     become: yes
     lineinfile:
       destfile: /etc/kibana/kibana.yml
       regexp: '#server.host'
-      line: 'server.host: "0.0.0.0"'
+      line: 'server.host: "127.0.0.1"'
     
   - name: Start Kibana Service
     become: yes
