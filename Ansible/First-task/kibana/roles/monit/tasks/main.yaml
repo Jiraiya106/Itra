@@ -8,4 +8,11 @@
     copy:
       src: ../files/monitrc
       dest: /etc/monit
-      sudo: yes
+      mode: 0600
+      owner: root 
+      group: root
+
+  - name: restart monit
+    service: 
+      name: monit 
+      state: restarted

@@ -1,9 +1,9 @@
 
 [all]
-localhost  ansible_port=2222    ansible_connection=local 
+127.0.0.1 ansible_port=2222 ansible_user=vagrant ansible_password=vagrant ansible_ssh_common_args="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
 
 [vagrant]
 #localhost ansible_port=1122
 
 [vagrant_not_secure]
-#localhost ansible_port=2222 ansible_user=vagrant ansible_password=vagrant ansible_become_password=vagrant
+#localhost              ansible_connection=local 

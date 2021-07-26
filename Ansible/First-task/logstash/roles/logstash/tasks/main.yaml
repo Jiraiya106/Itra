@@ -1,21 +1,18 @@
   - name: Download Logstash Deb Package
     get_url:
-      url: https://artifacts.elastic.co/downloads/logstash/logstash-7.13.4.deb
+      url: https://artifacts.elastic.co/downloads/logstash/logstash-7.13.4-amd64.deb
       dest: /tmp
     
   - name: Install Logstash Deb Package
-    become: yes
     apt:
-      deb: /tmp/logstash-7.13.4.deb
+      deb: /tmp/logstash-7.13.4-amd64.deb
 
   - name: Create Logstash Pipeline File
-    become: yes
     file:
       path: /etc/logstash/conf.d/main.conf
       state: touch
 
   - name: Add Logstash Pipeline Configuration
-    become: yes
     blockinfile:
       path: /etc/logstash/conf.d/main.conf
       marker: ""
@@ -33,7 +30,6 @@
         }
 
   - name: Start Logstash Service
-    become: yes
     service:
       name: logstash
       state: started

@@ -5,4 +5,4 @@
 
   - name: Install required packages
     apt: 
-      name: httpd
+      name: apache2

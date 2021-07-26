@@ -8,4 +8,8 @@
     copy:
       src: ../files/rsyslog.conf
       dest: /etc/rsyslog.conf
-      sudo: yes
+
+  - name: Restarted rsyslog
+    service:
+      name: rsyslog
+      state: restarted
