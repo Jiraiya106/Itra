@@ -1,5 +1,5 @@
 - hosts: all
-  #become: yes
+  become: true
   gather_facts: yes
   roles:
     - { role: apt }

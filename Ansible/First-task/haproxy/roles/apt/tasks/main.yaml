@@ -1,9 +1,19 @@
 ---
+  # - name: Include variables
+  #   include_vars:
+  #     file: ../vars/main.yml
+
   - name: Update apt cache
     apt: 
       update_cache: yes
+      upgrade: yes
+      cache_valid_time: 3600
+    become: true 
 
   - name: Install required packages
-    apt: name={{ item }}
-    with_items:
-      - haproxy
+    apt: 
+      name: "{{ item }}"
+    # with_items:
+    #   - git
+    #   - htop
+    become: true

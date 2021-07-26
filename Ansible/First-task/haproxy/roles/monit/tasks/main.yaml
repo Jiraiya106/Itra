@@ -7,5 +7,12 @@
   - name: Copy config monit
     copy:
       src: ../files/monitrc
-      dest: /etc/monit
-      sudo: yes
+      dest: /etc/monit/monitrc
+      mode: 0600
+      owner: root 
+      group: root
+
+  - name: restart monit
+    service: 
+      name: monit 
+      state: restarted
