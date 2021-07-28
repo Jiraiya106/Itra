@@ -2,6 +2,8 @@
   become: true
   gather_facts: yes
   roles:
-    - { role: apt }
+    - { role: apt,  apt_packages: [ git, htop ]}
     - { role: haproxy }
     - { role: monit }
+    - { role: ini }
+    - { role: ntp }

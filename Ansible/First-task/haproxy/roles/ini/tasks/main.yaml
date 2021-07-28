@@ -1,0 +1,9 @@
+- shell: ps -e | grep "VBox" | awk 'NR==1{print $1}'
+  register: unique_id
+
+- ini_file: 
+    dest: /etc/ini_ab-haproxy 
+    section: general
+    option: uniqueID 
+    value: "{{ unique_id.stdout }}" 
+    mode: 0600

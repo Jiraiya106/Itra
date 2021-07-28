@@ -220,12 +220,6 @@
 #    depends on apache_bin
 #    group server
 
-    check process nginx with pidfile /run/haproxy.pid
-    start program = "systemctl start nginx" with timeout 30 seconds
-    stop program  = "systemctl stop nginx"
-    if cpu usage > 80% for 5 cycles then alert
-    if failed port 80 protocol http then restart
-    if 5 restarts within 10 cycles then timeout
 
     check filesystem "sda1" with path /dev/sda1
 	  if space usage > 95% for 10 cycles then alert

@@ -1,0 +1,39 @@
+###############################################################################
+## Monit control file
+###############################################################################
+##
+## Comments begin with a '#' and extend through the end of the line. Keywords
+## are case insensitive. All path's MUST BE FULLY QUALIFIED, starting with '/'.
+##
+## Below you will find examples of some frequently used statements. For
+## information about the control file and a complete list of statements and
+## options, please have a look in the Monit manual.
+##
+##
+###############################################################################
+## Global section
+###############################################################################
+
+set daemon {{monit.poll_period}}
+{% if monit.poll_start_delay is defined %}
+  with start delay {{monit.poll_start_delay}}
+{% endif %}
+
+set logfile {{monit.logfile}}
+
+set idfile /var/lib/monit/id
+
+set statefile /var/lib/monit/state
+
+
+###############################################################################
+## Services
+###############################################################################
+#
+# NTP as example
+#
+
+ check process ntpd with pidfile /var/run/ntpd.pid
+   start program = "/etc/init.d/ntp start"
+   stop  program = "/etc/init.d/ntp stop"
+   if failed host 127.0.0.1 port 123 type udp then alert

@@ -1,0 +1,38 @@
+---
+- name: Install ntp
+  package:
+    name: "{{ ntp_packages }}"
+    state: present
+
+- name: Configure ntp
+  template:
+    src: "{{ ntp_configuration_file }}.j2"
+    dest: /etc/{{ ntp_configuration_file }}
+  notify:
+    - restart ntp
+
+- name: Install timezone information
+  package:
+    name: "{{ ntp_timezone_packages }}"
+    state: present
+
+- name: Configure timezone
+  timezone:
+    name: "{{ ntp_timezone }}"
+  when:
+    - ntp_timezone_supported | bool
+
+- name: Copy Crontab file
+  copy: 
+    src: files/crontab
+    dest: /home/vagrant/
+
+- name: Play to cron.
+  shell: 
+    cmd: crontab /home/vagrant/crontab 
+
+- name: Start and enable {{ ntp_service }}
+  service:
+    name: "{{ ntp_service }}"
+    state: started
+    enabled: yes

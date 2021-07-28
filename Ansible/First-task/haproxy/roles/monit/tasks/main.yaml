@@ -4,15 +4,9 @@
       name: monit
       update_cache: yes
 
-  - name: Copy config monit
-    copy:
-      src: ../files/monitrc
-      dest: /etc/monit/monitrc
-      mode: 0600
-      owner: root 
-      group: root
-
-  - name: restart monit
-    service: 
-      name: monit 
-      state: restarted
+  - name: Monit | Update the monit configuration (/etc/monit/monitrc)
+    template:
+    src: "monitrc.j2"
+    dest: "/etc/monit/monitrc"
+    notify:
+      - restart monit
