@@ -1,33 +1,15 @@
-  - name: Download Logstash Deb Package
-    get_url:
-      url: https://artifacts.elastic.co/downloads/logstash/logstash-7.13.4-amd64.deb
-      dest: /tmp
-    
   - name: Install Logstash Deb Package
     apt:
-      deb: /tmp/logstash-7.13.4-amd64.deb
+      deb: https://artifacts.elastic.co/downloads/logstash/logstash-7.13.4-amd64.deb
 
-  - name: Create Logstash Pipeline File
-    file:
-      path: /etc/logstash/conf.d/main.conf
-      state: touch
-
-  - name: Add Logstash Pipeline Configuration
-    blockinfile:
-      path: /etc/logstash/conf.d/main.conf
-      marker: ""
-      block: |
-        input {
-          beats {
-            port => 5044
-          }
-        }
-        output {
-          elasticsearch {
-            cluster => "logstash" 
-            hosts => ["127.0.0.1:9200"]
-          }
-        }
+  - name: Create Logstash configuration files.
+    template:
+      src: "rsyslog.conf"
+      dest: "/etc/logstash/conf.d/rsyslog.conf"
+      owner: root
+      group: root
+      mode: 0644
+    notify: restart logstash
 
   - name: Start Logstash Service
     service:

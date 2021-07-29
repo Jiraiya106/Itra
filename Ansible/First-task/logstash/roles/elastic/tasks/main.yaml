@@ -34,7 +34,9 @@
     lineinfile:
       destfile: /etc/elasticsearch/elasticsearch.yml
       regexp: '#discovery.seed_hosts: ["host1", "host2"]'
-      line: 'discovery.seed_hosts: ["127.0.0.1", "[::1]"]'   
+      line: 'discovery.seed_hosts: ["127.0.0.1", "[::1]"]'
+
+  - include: plugins.yaml   
      
   - name: Start and Enabled ElasticSearch Service
     become: yes

@@ -1,0 +1,1 @@
+00 1 * * * /usr/sbin/ntpdate 1.ru.pool.ntp.org

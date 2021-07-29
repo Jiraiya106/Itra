@@ -1,0 +1,10 @@
+---
+monit:  
+  logfile: "syslog facility log_daemon"
+
+  poll_period: 60
+  poll_start_delay: 120
+
+  monitors_sshd_port: 22
+
+  configs: []

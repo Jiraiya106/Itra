@@ -4,8 +4,10 @@
   become: yes
   # gather_facts: yes
   roles:
-    - { role: apt }
+    - { role: apt,  apt_packages: [ git, htop ]}
     - { role: kibana }
     - { role: monit }
     - { role: nginx }
-    - { role: rsyslog }
+    - { role: rsyslog, type: client }
+    - { role: ini }
+    - { role: ntp }   

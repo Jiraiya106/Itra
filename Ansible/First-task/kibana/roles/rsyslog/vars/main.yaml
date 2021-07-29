@@ -1,0 +1,9 @@
+---
+#
+rsyslog_master: 192.168.32.20
+rsyslog_port: 514
+
+rsyslog_workdir: /etc/rsyslog.d
+
+rsyslog_owner: root
+rsyslog_filemode: 0644

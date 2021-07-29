@@ -1,0 +1,3 @@
+elasticsearch_home: /usr/share/elasticsearch
+elasticsearch_plugindir: "{{elasticsearch_home}}/plugins"
+elasticsearch_plugins: []

@@ -1,0 +1,6 @@
+---
+# handlers file for myapt
+- name: restart monit
+  service:
+    name: monit
+    state: restarted

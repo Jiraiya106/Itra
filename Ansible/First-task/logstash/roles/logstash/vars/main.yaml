@@ -1,0 +1,4 @@
+rsyslog_port: 514
+elasticsearch_cluster: "logstash"
+elasticsearch_host: 192.168.32.10
+elasticsearch_port: 9200

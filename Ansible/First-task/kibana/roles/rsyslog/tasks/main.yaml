@@ -1,15 +1,23 @@
 ---
-  - name: Install and update required packages
-    apt: 
-      name: rsyslog
-      update_cache: yes
+- name: Install rsyslog
+  apt:
+    name: rsyslog
+    state: latest
 
-  - name: Copy config rsyslog
-    copy:
-      src: ../files/rsyslog.conf
-      dest: /etc/rsyslog.conf
+- name: Setup rsyslog to send logs remotly
+  template: 
+    src: 70-output.conf.j2
+    dest: "{{ rsyslog_workdir }}/70-output.conf"
+    owner: "{{ rsyslog_owner }}"
+    mode: "{{ rsyslog_filemode }}"
+  notify:
+    - restart rsyslog
 
-  - name: Restarted rsyslog
-    service:
-      name: rsyslog
-      state: restarted
+- name: Setup rsyslog to format logs to json
+  template: 
+    src: 01-json-template.conf
+    dest: "{{ rsyslog_workdir }}/01-json-template.conf"
+    owner: "{{ rsyslog_owner }}" 
+    mode: "{{ rsyslog_filemode }}"
+  notify:
+    - restart rsyslog

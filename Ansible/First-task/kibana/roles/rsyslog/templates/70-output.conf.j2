@@ -1,0 +1,6 @@
+# This line sends all lines to defined IP address at port 10514
+# using the json-template format.
+
+{% if type == "client" %}
+*.*                         @{{ rsyslog_master }}:{{ rsyslog_port }};json-template
+{% endif %}

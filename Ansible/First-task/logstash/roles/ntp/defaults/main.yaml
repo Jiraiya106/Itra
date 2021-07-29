@@ -1,0 +1,27 @@
+---
+ntp_packages: 
+  - ntp
+
+ntp_configuration_file: ntp.conf
+
+ntp_service: ntp
+
+ntp_timezone_packages: 
+  - tzdata
+
+ntp_timezone_supported: yes
+
+ntp_interfaces:
+  - address: 127.0.0.1
+
+ntp_restrict:
+  - address: 127.0.0.1
+  - address: ::1
+
+ntp_pool:
+  - name: 0.pool.ntp.org iburst
+  - name: 1.pool.ntp.org iburst
+  - name: 2.pool.ntp.org iburst
+  - name: 3.pool.ntp.org iburst
+
+ntp_timezone: Europe/Minsk
