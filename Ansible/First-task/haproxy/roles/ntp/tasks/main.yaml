@@ -28,6 +28,9 @@
     hour: "1" 
     minute: "30" 
     job: "/usr/sbin/ntpdate 0.north-america.pool.ntp.org > /dev/null"
+    cron_file: "/etc/crontab"
+    user: root
+    state: present
 
 - name: Start and enable {{ ntp_service }}
   service:

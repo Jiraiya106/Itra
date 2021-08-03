@@ -1,0 +1,32 @@
+---
+- name: Install rsyslog
+  apt:
+    name: rsyslog
+    state: latest
+
+- name: Setup rsyslog to send logs remotly
+  template: 
+    src: rsyslog.conf
+    dest: "/etc/rsyslog.conf"
+    owner: "{{ rsyslog_owner }}"
+    mode: "{{ rsyslog_filemode }}"
+  notify:
+    - restart rsyslog
+
+- name: Setup rsyslog to format logs to json
+  template: 
+    src: 01-json-template.conf
+    dest: "{{ rsyslog_workdir }}/01-json-template.conf"
+    owner: "{{ rsyslog_owner }}" 
+    mode: "{{ rsyslog_filemode }}"
+  notify:
+    - restart rsyslog
+
+- name: Setup rsyslog to format logs to json
+  template: 
+    src: 60-output.conf
+    dest: "{{ rsyslog_workdir }}/60-output.conf"
+    owner: "{{ rsyslog_owner }}" 
+    mode: "{{ rsyslog_filemode }}"
+  notify:
+    - restart rsyslog

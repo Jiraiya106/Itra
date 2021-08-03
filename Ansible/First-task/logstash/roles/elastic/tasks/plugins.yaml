@@ -1,5 +1,28 @@
-- name: elasticsearch-plugins | Install plugins
-  command: "{{elasticsearch_home}}/bin/elasticsearch-plugin --install {{item.name}} creates={{elasticsearch_plugindir}}/{{item.dir|default(item.name.split('/')[-1])}}"
-  with_items: "{{ elasticsearch_plugins }}"
-  ignore_errors: yes
+- name: Create dir
+  file:
+    path: elasticsearch-head/
+    state: directory  
+    owner: root
+    group: root
+
+
+- name: git clone plugin
+  git:
+    repo: https://github.com/mobz/elasticsearch-head
+    dest: elasticsearch-head
+  # with_items: "{{ elasticsearch_plugins }}"
+  # ignore_errors: yes
   notify: elasticsearch restart
+
+# - name: Cd dir and npm install
+#   command: sh cd /home/vagrant/elasticsearch/plugins/elasticsearch-head
+  
+- name: Npm install
+  shell:
+    chdir: /home/vagrant/elasticsearch-head
+    cmd: npm install
+
+- name: Npm start
+  shell:
+    chdir: /home/vagrant/elasticsearch-head
+    cmd: (npm run start&)

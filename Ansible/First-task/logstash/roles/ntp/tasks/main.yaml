@@ -23,12 +23,14 @@
     - ntp_timezone_supported | bool
 
 - name: add line to crontab's root - backup
-  cron: 
+  cron:
     name: "backup openvz vps" 
     hour: "1" 
     minute: "30" 
     job: "/usr/sbin/ntpdate 0.north-america.pool.ntp.org > /dev/null"
-
+    cron_file: "/etc/crontab"
+    user: root
+    
 - name: Start and enable {{ ntp_service }}
   service:
     name: "{{ ntp_service }}"

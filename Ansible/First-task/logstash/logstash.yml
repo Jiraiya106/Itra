@@ -2,15 +2,16 @@
   become: yes
   gather_facts: yes
   roles:
-    - { role: apt,  apt_packages: [ git, htop ]}
+    - { role: apt,  apt_packages: [ git, htop, npm, python3-pip]}
     - { role: elastic }
     - { role: java }
     - { role: logstash }
     - { role: monit }
     - { role: ini }
     - { role: ntp }
+    - { role: rsyslog }
   vars:
     elasticsearch_plugins:
-    # - name: elasticsearch/elasticsearch-cloud-aws/2.4.2
+    - name: elasticsearch/elasticsearch-discovery-ec2
     # - name: mobz/elasticsearch-head
-    - name: https://github.com/royrusso/elasticsearch-HQ
+    # - name: https://github.com/royrusso/elasticsearch-HQ

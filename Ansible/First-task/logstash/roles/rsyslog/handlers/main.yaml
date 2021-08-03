@@ -1,0 +1,9 @@
+---
+  - name: Delay
+    wait_for:
+      delay: 60
+
+  - name: restart rsyslog
+    service:
+      name: rsyslog
+      state: restarted

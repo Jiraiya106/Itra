@@ -18,8 +18,4 @@
   - name: Started haproxy
     service: 
       name: haproxy 
-      state: started    
-  # - name: restart haproxy
-  #   service: 
-  #     name: haproxy 
-  #     state: restarted
+      state: started

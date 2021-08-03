@@ -1,0 +1,9 @@
+---
+  - name: Delay
+    wait_for:
+      delay: 60
+
+  - name: restart kibana
+    service: 
+      name: kibana 
+      state: restarted

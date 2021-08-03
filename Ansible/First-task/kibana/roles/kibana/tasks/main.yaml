@@ -3,27 +3,37 @@
     apt:
       deb: https://artifacts.elastic.co/downloads/kibana/kibana-{{ kibana_version }}-amd64.deb
   
-  - name: Update Kibana Config (Port)
-    become: yes
-    lineinfile:
-      destfile: "{{ kibana_config }}"
-      regexp: '#server.port: 5601'
-      line: 'server.port: {{ kibana_port }}'
+  # - name: Update Kibana Config (Port)
+  #   become: yes
+  #   lineinfile:
+  #     destfile: "{{ kibana_config }}"
+  #     regexp: '#server.port: 5601'
+  #     line: 'server.port: {{ kibana_port }}'
 
-  - name: Update Kibana Config (IP Address)
-    become: yes
-    lineinfile:
-      destfile: "{{ kibana_config }}"
-      regexp: '#server.host'
-      line: 'server.host: "{{ kibana_server }}"'
+  # - name: Update Kibana Config (IP Address)
+  #   become: yes
+  #   lineinfile:
+  #     destfile: "{{ kibana_config }}"
+  #     regexp: '#server.host'
+  #     line: 'server.host: "{{ kibana_server }}"'
 
-  - name: Update Kibana Config (Elasticsearch)
-    become: yes
-    lineinfile:
-      destfile: "{{ kibana_config }}"
-      regexp: '#elasticsearch.hosts: ["http://localhost:9200"]'
-      line: 'elasticsearch.hosts: ["http://192.168.32.10:9200"]'
-    
+  # - name: Update Kibana Config (Elasticsearch)
+  #   become: yes
+  #   lineinfile:
+  #     destfile: "{{ kibana_config }}"
+  #     regexp: '#elasticsearch.hosts: ["http://localhost:9200"]'
+  #     line: 'elasticsearch.hosts: ["http://192.168.32.10:9200"]'
+  
+  - name: Config Nginx
+    template:
+      src: kibana.yml.j2
+      dest: /etc/kibana/kibana.yml
+      mode: 0644
+      owner: root 
+      group: root
+    notify: restart kibana
+
+
   - name: Start Kibana Service
     become: yes
     service:

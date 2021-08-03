@@ -1,0 +1,90 @@
+
+
+##### provision brand new ubuntu 18.04 server
+
+# ...
+
+##### setup group and user
+
+- name: create docker group
+  become: true
+  group:
+    name: docker
+    state: present
+
+- name: add user to group 
+  become: true
+  user:
+    name: "{{ansible_user}}"
+    groups: docker
+    append: true
+
+- meta: reset_connection                # <--- must do this if using pipelining
+
+##### setup docker
+
+- name: install packages required by docker
+  become: true
+  apt:
+    update_cache: yes
+    state: latest
+    name:
+    - apt-transport-https
+    - ca-certificates
+    - curl
+    - gpg-agent
+    - software-properties-common
+
+- name: add docker GPG key
+  become: true
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+
+- name: add docker apt repo
+  become: true
+  apt_repository:
+    repo: deb https://download.docker.com/linux/ubuntu bionic stable
+    state: present
+
+- name: install docker
+  become: true
+  apt:
+    update_cache: yes
+    state: latest
+    name:
+    - docker-ce
+    - docker-ce-cli
+    - containerd.io
+
+##### setup ansible <---> docker
+
+- name: install python dependencies
+  become: true
+  apt:
+    update_cache: yes
+    state: latest
+    name: python3-pip
+
+- name: install 'Docker SDK for Python'
+  # become: true              
+  pip:
+    name: docker
+    executable: pip3
+
+
+- name: Docker elasticsearch-HQ
+  become: true 
+  docker_container:
+    name: elasticsearch
+    image: elastichq/elasticsearch-hq
+    published_ports: 192.168.32.10:5000:5000
+  ignore_errors: yes
+
+- name: Docker elasticsearch-head
+  become: true 
+  docker_container:
+    name: elasticsearch-head
+    image: mobz/elasticsearch-head:5
+    published_ports: 192.168.32.10:9100:9100
+  ignore_errors: yes
