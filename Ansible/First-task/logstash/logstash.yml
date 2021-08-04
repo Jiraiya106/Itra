@@ -13,5 +13,4 @@
   vars:
     elasticsearch_plugins:
     - name: elasticsearch/elasticsearch-discovery-ec2
-    # - name: mobz/elasticsearch-head
-    # - name: https://github.com/royrusso/elasticsearch-HQ
+    ansible_python_interpreter: /usr/bin/python3
