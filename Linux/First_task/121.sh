@@ -111,13 +111,18 @@ do
       
       if [ "$counter" -le "$NESTED_DEPTH" ]
       then
-        $(mkdir $DIRECTORY/$name) 
-        DIRECTORY="${DIRECTORY}/${name}"
-        echo $DO_IT $name $counter $NESTED_DEPTH
+        DIRARR+=("$DIRECTORY")
+        mkdir $DIRECTORY/$name
+        DIRECTORY="${DIRECTORY}${name}/"
+        echo $DO_IT $name $counter $NESTED_DEPTH 
+        echo ${DIRARR[*]}
         ((counter++))
       else
-        mkdir $DIRECTORY/$name 
+        r=$(shuf -i 0-${#DIRARR[@]} -n 1)
+        SELECTDIR=${DIRARR[$r]}
+        mkdir $SELECTDIR/$name 
         echo "i am"
+        echo $DO_IT $name $SELECTDIR
       fi
   fi
 
