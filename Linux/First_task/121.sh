@@ -64,7 +64,13 @@ case $key in
 esac
 done
 
-mkdir $DIRECTORY
+# if [[ ! -e $DIRECTORY ]]; then
+    
+#     mkdir $DIRECTORY
+# fi
+
+mkdir -p $DIRECTORY
+echo ${POSITIONAL[*]}
 
 # Функция определения длинны и веса
 func_max_min(){
@@ -118,11 +124,10 @@ do
         echo ${DIRARR[*]}
         ((counter++))
       else
-        r=$(shuf -i 0-${#DIRARR[@]} -n 1)
-        SELECTDIR=${DIRARR[$r]}
+        r=$(shuf -i 1-${#DIRARR[@]} -n 1)
+        SELECTDIR=${DIRARR[$r-1]}
         mkdir $SELECTDIR/$name 
         echo "i am"
-        echo $DO_IT $name $SELECTDIR
       fi
   fi
 
@@ -152,63 +157,3 @@ done
 #     ;;
 # esac
 # done
-# while getopts ":d:directory::nd:" opt; do
-#   case $opt in
-#     a) arg_1="$OPTARG"
-#     ;;
-#     p) p_out="$OPTARG"
-#     ;;
-#     \?) echo "Invalid option -$OPTARG" >&2
-#     ;;
-#   esac
-# done
-
-# while [ $# -gt 0 ]; do
-#   case "$1" in
-#     --p_out=*)
-#       p_out="${1#*=}"
-#       ;;
-#     --arg_1=*)
-#       arg_1="${1#*=}"
-#       ;;
-#     *)
-#       printf "***************************\n"
-#       printf "* Error: Invalid argument.*\n"
-#       printf "***************************\n"
-#       exit 1
-#   esac
-#   shift
-# done
-#    ;;
-#     \?) echo "Invalid option -$OPTARG" >&2
-#     ;;
-#   esac
-# done
-
-# while [ $# -gt 0 ]; do
-#   case "$1" in
-#     --p_out=*)
-#       p_out="${1#*=}"
-#       ;;
-#     --arg_1=*)
-#       arg_1="${1#*=}"
-#       ;;
-#     *)
-#       printf "***************************\n"
-#       printf "* Error: Invalid argument.*\n"
-#       printf "***************************\n"
-#       exit 1
-#   esac
-#   shift
-# done
-
-
-# Эти два способа могут быть скомбинированы.
-# func_max_min(){
-# number=0   #initialize
-# while [ "$number" -le $1 ]
-# do
-#   number=$RANDOM
-#   let "number %= $2"  # Ограничение "сверху" числом $RANGE.
-# done
-# }
