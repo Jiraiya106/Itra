@@ -1,12 +1,96 @@
 #!/bin/bash
-DIRECTORY=$1
-NESTED_DEPTH=$2
-MIN_SIZE=$3
-MAX_SIZE=$4
-MAX_ITERATION=$5
-MIN_LENGTH=$6
-MAX_LENGTH=$7
+# DIRECTORY=$1
+# NESTED_DEPTH=$2
+# MIN_SIZE=$3
+# MAX_SIZE=$4
+# MAX_ITERATION=$5
+# MIN_LENGTH=$6
+# MAX_LENGTH=$7
 
+while [[ $# -gt 0 ]]
+do
+key="$1"
+
+case $key in
+    -d|--directory)
+    DIRECTORY="$2"
+    shift # past argument
+    shift # past value
+    ;;
+    -n|--nested-depth)
+    NESTED_DEPTH="$2"
+    shift # past argument
+    shift # past value
+    ;;
+    -s|--min-size)
+    MIN_SIZE="$2"
+    shift # past argument
+    shift # past value
+    ;;
+    -S|--max-size)
+    MAX_SIZE="$2"
+    shift # past argument
+    shift # past value
+    ;;
+    -i|--max-iteration)
+    MAX_ITERATION="$2"
+    shift # past argument
+    shift # past value
+    ;;
+    -l|--min-length)
+    MIN_LENGTH="$2"
+    shift # past argument
+    shift # past value
+    ;;
+    -L|--max-length)
+    MAX_LENGTH="$2"
+    shift # past argument
+    shift # past value
+    ;;
+    -f|--file-content)
+    FILE_CONTENT="$2"
+    shift # past argument
+    shift # past value
+    ;;
+    -r|--random)
+    FILE_CONTENT="[:print:]"
+    shift # past argument
+    shift # past value
+    ;;     
+    *)    # unknown option
+    POSITIONAL+=("$1") # save it in an array for later
+    shift # past argument
+    ;;
+esac
+done
+
+mkdir $DIRECTORY
+
+echo $NESTED_DEPTH
+# for i in "$@"
+# do
+# case $i in
+#     -e=*|--extension=*)
+#     EXTENSION="${i#*=}"
+#     shift # past argument=value
+#     ;;
+#     -s=*|--searchpath=*)
+#     SEARCHPATH="${i#*=}"
+#     shift # past argument=value
+#     ;;
+#     -l=*|--lib=*)
+#     LIBPATH="${i#*=}"
+#     shift # past argument=value
+#     ;;
+#     --default)
+#     DEFAULT=YES
+#     shift # past argument with no value
+#     ;;
+#     *)
+#           # unknown option
+#     ;;
+# esac
+# done
 # while getopts ":d:directory::nd:" opt; do
 #   case $opt in
 #     a) arg_1="$OPTARG"
@@ -57,38 +141,41 @@ MAX_LENGTH=$7
 #   shift
 # done
 
+
 # Эти два способа могут быть скомбинированы.
+# func_max_min(){
+# number=0   #initialize
+# while [ "$number" -le $1 ]
+# do
+#   number=$RANDOM
+#   let "number %= $2"  # Ограничение "сверху" числом $RANGE.
+# done
+# }
+
+# Функция определения длинны и веса
 func_max_min(){
-number=0   #initialize
-while [ "$number" -le $1 ]
-do
-  number=$RANDOM
-  let "number %= $2"  # Ограничение "сверху" числом $RANGE.
-done
+    number=$(shuf -i $1-$2 -n 1)
 }
 
-func_max_min $MIN_LENGTH $MAX_LENGTH
-LENGTH=$number
-echo "Length: $LENGTH"
-
-func_max_min $MIN_SIZE $MAX_SIZE
-SIZE=$number
-echo "Size: $SIZE"
-
+#Функция определения "file" или "directory" и имени
 file_directory () {
-BINARY=2
-number=$RANDOM
-T=1
-name=$(head -c 100 /dev/urandom | base64 | sed 's/[+=/A-Z]//g' | tail -c "$LENGTH")
+  BINARY=2
+  number=$RANDOM
+  T=1
+  func_max_min $MIN_LENGTH $MAX_LENGTH
+    LENGTH=$number
+    # echo "Length: $LENGTH"
 
-let "number %= $BINARY"
+  name=$(head -c 100 /dev/urandom | base64 | sed 's/[+=/A-Z]//g' | tail -c "$LENGTH")
 
-if [ "$number" -eq $T ]
-then
-  DO_IT=file
-else
-  DO_IT=directory
-fi
+  let "number %= $BINARY"
+
+  if [ "$number" -eq $T ]
+    then
+      DO_IT=file
+  else
+      DO_IT=directory
+  fi
 }
 
 
@@ -100,13 +187,11 @@ do
 
   if [ "$DO_IT" = "file" ]
   then
-      #dd if=/dev/urandom of=${name}.txt bs=${SIZE}M count=1 iflag=fullblock
-      #$(head -c ${SIZE}M </dev/urandom | sed 's/[+=/A-Z]//g' >${name}.txt)${SIZE}
-      #$(head /dev/urandom | tr -dc 3 | head -c5K > ${name}.txt) 
-      #$(while true;do head /dev/urandom | tr -dc 3;done | head -c5K > ${name}.txt)
-      #while true;do head /dev/urandom | tr -dc A-Za-z0-9;done | head -c 5K > 
-      #< /dev/urandom tr -dc "[:space:][:print:]" | head -c66 > ${name}.txt
-      < /dev/urandom tr -dc "3" | head -c5K > $DIRECTORY/${name}.txt
+      func_max_min $MIN_SIZE $MAX_SIZE
+      SIZE=$number
+      # echo "Size: $SIZE"
+
+      < /dev/urandom tr -dc $FILE_CONTENT | head -c${SIZE} > $DIRECTORY/${name}.txt
       echo $DO_IT $name
   else
       
@@ -123,12 +208,3 @@ do
   fi
 
 done 
-
-echo "Случайное число в диапазоне от FLOOR до RANGE ---  $number"
-echo $(head /dev/urandom | tr -dc 13 | head -c 3 ; echo '')
-
-# Глубина вложенности
-# for i in {1..100}
-# do
-#     mkdir subdirectory_$i
-# done
