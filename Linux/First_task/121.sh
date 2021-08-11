@@ -66,7 +66,63 @@ done
 
 mkdir $DIRECTORY
 
-echo $NESTED_DEPTH
+# Функция определения длинны и веса
+func_max_min(){
+    number=$(shuf -i $1-$2 -n 1)
+}
+
+#Функция определения "file" или "directory" и имени
+file_directory () {
+  BINARY=2
+  number=$RANDOM
+  T=1
+  func_max_min $MIN_LENGTH $MAX_LENGTH
+    LENGTH=$number
+    # echo "Length: $LENGTH"
+
+  name=$(head -c 100 /dev/urandom | base64 | sed 's/[+=/A-Z]//g' | tail -c "$LENGTH")
+
+  let "number %= $BINARY"
+
+  if [ "$number" -eq $T ]
+    then
+      DO_IT=file
+  else
+      DO_IT=directory
+  fi
+}
+
+
+# Генерация случайных "file" или "directory" .
+counter=1
+for ((a=1; a <= MAX_ITERATION ; a++))  
+do
+  file_directory
+
+  if [ "$DO_IT" = "file" ]
+  then
+      func_max_min $MIN_SIZE $MAX_SIZE
+      SIZE=$number
+      # echo "Size: $SIZE"
+
+      < /dev/urandom tr -dc $FILE_CONTENT | head -c${SIZE} > $DIRECTORY/${name}.txt
+      echo $DO_IT $name
+  else
+      
+      if [ "$counter" -le "$NESTED_DEPTH" ]
+      then
+        $(mkdir $DIRECTORY/$name) 
+        DIRECTORY="${DIRECTORY}/${name}"
+        echo $DO_IT $name $counter $NESTED_DEPTH
+        ((counter++))
+      else
+        mkdir $DIRECTORY/$name 
+        echo "i am"
+      fi
+  fi
+
+done 
+
 # for i in "$@"
 # do
 # case $i in
@@ -151,60 +207,3 @@ echo $NESTED_DEPTH
 #   let "number %= $2"  # Ограничение "сверху" числом $RANGE.
 # done
 # }
-
-# Функция определения длинны и веса
-func_max_min(){
-    number=$(shuf -i $1-$2 -n 1)
-}
-
-#Функция определения "file" или "directory" и имени
-file_directory () {
-  BINARY=2
-  number=$RANDOM
-  T=1
-  func_max_min $MIN_LENGTH $MAX_LENGTH
-    LENGTH=$number
-    # echo "Length: $LENGTH"
-
-  name=$(head -c 100 /dev/urandom | base64 | sed 's/[+=/A-Z]//g' | tail -c "$LENGTH")
-
-  let "number %= $BINARY"
-
-  if [ "$number" -eq $T ]
-    then
-      DO_IT=file
-  else
-      DO_IT=directory
-  fi
-}
-
-
-# Генерация случайных "file" или "directory" .
-counter=1
-for ((a=1; a <= MAX_ITERATION ; a++))  # Двойные круглые скобки и "LIMIT" без "$".
-do
-  file_directory
-
-  if [ "$DO_IT" = "file" ]
-  then
-      func_max_min $MIN_SIZE $MAX_SIZE
-      SIZE=$number
-      # echo "Size: $SIZE"
-
-      < /dev/urandom tr -dc $FILE_CONTENT | head -c${SIZE} > $DIRECTORY/${name}.txt
-      echo $DO_IT $name
-  else
-      
-      if [ "$counter" -le "$NESTED_DEPTH" ]
-      then
-        $(mkdir $DIRECTORY/$name) 
-        DIRECTORY="${DIRECTORY}/${name}"
-        echo $DO_IT $name $counter $NESTED_DEPTH
-        ((counter++))
-      else
-        mkdir $DIRECTORY/$name 
-        echo "i am"
-      fi
-  fi
-
-done 
