@@ -1,68 +1,115 @@
 #!/bin/bash
-# DIRECTORY=$1
-# NESTED_DEPTH=$2
-# MIN_SIZE=$3
-# MAX_SIZE=$4
-# MAX_ITERATION=$5
-# MIN_LENGTH=$6
-# MAX_LENGTH=$7
+DIRECTORY=$1
+NESTED_DEPTH=$2
+MIN_SIZE=$3
+MAX_SIZE=$4
+MAX_ITERATION=$5
+MIN_LENGTH=$6
+MAX_LENGTH=$7
 
-while [[ $# -gt 0 ]]
+for i in "$@"
 do
-key="$1"
-
-case $key in
-    -d|--directory)
-    DIRECTORY="$2"
-    shift # past argument
-    shift # past value
+case $i in
+    -d=*|--directory=*)
+    DIRECTORY="${i#*=}"
+    shift # past argument=value
     ;;
-    -n|--nested-depth)
-    NESTED_DEPTH="$2"
-    shift # past argument
-    shift # past value
+    -n=*|--nested-depth=*)
+    NESTED_DEPTH="${i#*=}"
+    shift # past argument=value
     ;;
-    -s|--min-size)
-    MIN_SIZE="$2"
-    shift # past argument
-    shift # past value
+    -s=*|--min-size=*)
+    MIN_SIZE="${i#*=}"
+    shift # past argument=value
     ;;
-    -S|--max-size)
-    MAX_SIZE="$2"
-    shift # past argument
-    shift # past value
+    -S=*|--max-size=*)
+    MAX_SIZE="${i#*=}"
+    shift # past argument=value
     ;;
-    -i|--max-iteration)
-    MAX_ITERATION="$2"
-    shift # past argument
-    shift # past value
+    -i=*|--max-iteration=*)
+    MAX_ITERATION="${i#*=}"
+    shift # past argument=value
     ;;
-    -l|--min-length)
-    MIN_LENGTH="$2"
-    shift # past argument
-    shift # past value
+    -l=*|--min-length=*)
+    MIN_LENGTH="${i#*=}"
+    shift # past argument=value
     ;;
-    -L|--max-length)
-    MAX_LENGTH="$2"
-    shift # past argument
-    shift # past value
+    -L=*|--max-length=*)
+    MAX_LENGTH="${i#*=}"
+    shift # past argument=value
     ;;
-    -f|--file-content)
-    FILE_CONTENT="$2"
-    shift # past argument
-    shift # past value
+    -f=*|--file-content=*)
+    FILE_CONTENT="${i#*=}"
+    shift # past argument=value
     ;;
     -r|--random)
     FILE_CONTENT="[:print:]"
-    shift # past argument
-    shift # past value
-    ;;     
-    *)    # unknown option
-    POSITIONAL+=("$1") # save it in an array for later
-    shift # past argument
+    shift # past argument=value
+    ;;
+    *)
+          # unknown option
     ;;
 esac
 done
+
+echo $DIRECTORY $NESTED_DEPTH $MIN_SIZE $MAX_SIZE $MIN_LENGTH $MAX_LENGTH $MAX_ITERATION
+
+# while [[ $# -gt 0 ]]
+# do
+# key="$1"
+
+# case $key in
+#     -d|--directory)
+#     DIRECTORY="$2"
+#     shift # past argument
+#     shift # past value
+#     ;;
+#     -n|--nested-depth)
+#     NESTED_DEPTH="$2"
+#     shift # past argument
+#     shift # past value
+#     ;;
+#     -s|--min-size)
+#     MIN_SIZE="$2"
+#     shift # past argument
+#     shift # past value
+#     ;;
+#     -S|--max-size)
+#     MAX_SIZE="$2"
+#     shift # past argument
+#     shift # past value
+#     ;;
+#     -i|--max-iteration)
+#     MAX_ITERATION="$2"
+#     shift # past argument
+#     shift # past value
+#     ;;
+#     -l|--min-length)
+#     MIN_LENGTH="$2"
+#     shift # past argument
+#     shift # past value
+#     ;;
+#     -L|--max-length)
+#     MAX_LENGTH="$2"
+#     shift # past argument
+#     shift # past value
+#     ;;
+#     -f|--file-content)
+#     FILE_CONTENT="$2"
+#     shift # past argument
+#     shift # past value
+#     ;;
+#     -r|--random)
+#     FILE_CONTENT="[:print:]"
+#     shift # past argument
+#     shift # past value
+#     ;;     
+#     *)    # unknown option
+#     POSITIONAL+=("$1") # save it in an array for later
+#     shift # past argument
+#     ;;
+# esac
+# done
 
 # if [[ ! -e $DIRECTORY ]]; then
     
@@ -133,27 +180,3 @@ do
 
 done 
 
-# for i in "$@"
-# do
-# case $i in
-#     -e=*|--extension=*)
-#     EXTENSION="${i#*=}"
-#     shift # past argument=value
-#     ;;
-#     -s=*|--searchpath=*)
-#     SEARCHPATH="${i#*=}"
-#     shift # past argument=value
-#     ;;
-#     -l=*|--lib=*)
-#     LIBPATH="${i#*=}"
-#     shift # past argument=value
-#     ;;
-#     --default)
-#     DEFAULT=YES
-#     shift # past argument with no value
-#     ;;
-#     *)
-#           # unknown option
-#     ;;
-# esac
-# done
