@@ -16,7 +16,7 @@ case $i in
     MIN_SIZE="${i#*=}"
     shift # past argument=value
     ;;
-    -S=*|--max-size=*)
+    -S=*|--max-size=*)First2
     MAX_SIZE="${i#*=}"
     shift # past argument=value
     ;;
