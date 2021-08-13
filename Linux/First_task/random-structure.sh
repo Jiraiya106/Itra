@@ -16,7 +16,7 @@ case $i in
     MIN_SIZE="${i#*=}"
     shift # past argument=value
     ;;
-    -S=*|--max-size=*)First2
+    -S=*|--max-size=*)
     MAX_SIZE="${i#*=}"
     shift # past argument=value
     ;;
@@ -81,10 +81,10 @@ file_directory () {
   number=$RANDOM
   T=1
   func_max_min $MIN_LENGTH $MAX_LENGTH
-    LENGTH=$numberminmax
+  LENGTH=$numberminmax
 
-  name=$(head -c $(($MAX_LENGTH*2)) /dev/urandom | base64 | sed 's/[+=/A-Z]//g' | tail -c "$LENGTH")
-
+  name=$(head -c $(($MAX_LENGTH*2)) /dev/urandom | base64 | sed 's/[+=/A-Z]//g' | tr -d '\n' | tail -c "$LENGTH")
+  #echo "Name: $name"
   (( number %= $BINARY ))
 
   if [ "$number" -eq $T ]
@@ -118,12 +118,12 @@ do
       if [ "$counter" -le "$NESTED_DEPTH" ]
       then
         
-        mkdir $DIRECTORY/$name
+        mkdir -p $DIRECTORY/$name
         DIRECTORY="${DIRECTORY}/${name}/"
         ((counter++))
       else
         choicedir
-        mkdir $SELECTDIR/$name 
+        mkdir -p $SELECTDIR/$name 
         DIRARR+=("$SELECTDIR/$name")
       fi
   fi
@@ -131,7 +131,8 @@ done
 }
 
 file_content () {
-  < /dev/urandom tr -dc $FILE_CONTENT | head -c${SIZE} > $DIRECTORY/${name}.txt
+  #echo "Direcrory: $DIRECTORY  name: ${name}"
+  < /dev/urandom tr -dc $FILE_CONTENT | head -c${SIZE} > "$DIRECTORY"/"${name}".txt
 }
 
 main () {
