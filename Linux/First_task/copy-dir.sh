@@ -63,6 +63,8 @@ else
     esac
 fi
 }
+
+copyfile
 echo $DIRSPACE $FREEDISK
 
 
