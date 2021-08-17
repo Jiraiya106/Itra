@@ -6,23 +6,19 @@ DESTINATION_DIR=$(realpath "$2")
 idenname () {
 if [ "$1" == "$2" ]
 then
-    echo "ERROR 1"
-    #exit 0
+    echo "The same names"
+    exit 0
 fi
 }
 
-#Свободное место на диске
+#Free disk
 freedisk () {
     df "$1" | tail -1 | awk '{print$4}'
 }
 
-parentdir () {
-    dirname $1
-}
-
 directoryproblem () {
-PARENT_SOURCE=$(parentdir $SOURCE_DIR)
-PARENT_DESTINATION=$(parentdir $DESTINATION_DIR)
+PARENT_SOURCE=$(dirname $SOURCE_DIR)
+PARENT_DESTINATION=$(dirname $DESTINATION_DIR)
 
 if [ "$SOURCE_DIR" == "$PARENT_DESTINATION" ]
 then
@@ -34,7 +30,7 @@ then
 fi
 }
 
- #Объем папки
+ #Volume directory
 dirspace () {
     du -s "$1" | awk '{print$1}'
 }
@@ -48,20 +44,22 @@ copyfile () {
 FREE_DISK_DEST=$(freedisk $DESTINATION_DIR)
 DIR_SPACE_SOURCE=$(dirspace $SOURCE_DIR)
 
-if [ "$DIR_SPACE_SOURCE" -lt "$FREE_DISK_DEST" ]
+if [ "$DIR_SPACE_SOURCE" -lt "$FREE_DISK_DEST" ] 
 then
-    copyall $SOURCE_DIR $PARENT_DESTINATION 
-else 
-    echo 
-    read -p "Not enough free space no disk. Continue?(Y/N)" answer
-    case "$answer" in
-    Y | y) 
-        copyall $SOURCE_DIR $PARENT_DEST;;
-    N | n) 
-        exit 0;;
-    *)
-        copyfile
-    esac
+    copyall $SOURCE_DIR $DESTINATION_DIR 
+else
+    while true; do
+      read -p "Not enough free space no disk. Continue?(Y/N)" answer
+      case "$answer" in
+				Y | y) 
+					copyall $SOURCE_DIR $DESTINATION_DIR 
+					break 2;;
+				N | n) 
+					exit 0;;
+				*)
+					echo "Enter Y or N"
+      esac
+    done
 fi
 }
 
