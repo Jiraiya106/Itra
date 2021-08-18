@@ -48,7 +48,7 @@ copy_archive () {
     case $answer in 
       D | d)
         echo $SOURCE_DIR/ 
-        $(tar  -czpf $DESTINATION_DIR/$DATE_FORMAT.tar.gz  -C $SOURCE_DIR .)
+        $(tar  -czpf $DESTINATION_DIR/$DATE_FORMAT.tar.gz  -C $SOURCE_DIR ../ )
         break 2;;
       R | r)
         echo "Maximum number of copies " 
