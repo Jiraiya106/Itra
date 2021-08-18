@@ -10,7 +10,7 @@ the_same_names () {
 		echo "The same names"
 		exit 0
 	fi
-}
+} 
 
 #Free disk
 get_free_disk_space () {
