@@ -48,20 +48,21 @@ copy_archive () {
     case $answer in 
       D | d)
         echo $SOURCE_DIR/ 
-        $(tar  -czpf $DESTINATION_DIR/$DATE_FORMAT.tar.gz  -C $SOURCE_DIR ../ )
+        tar  -czpf $DESTINATION_DIR/$DATE_FORMAT.tar.gz  -C $PARENT_SOURC $(basename $SOURCE_DIR) 1>& out_$DATE_FORMAT.log && cat out_$DATE_FORMAT.log
         break 2;;
       R | r)
-        echo "Maximum number of copies " 
-        read -p "" copies
+        echo "Maximum number of copies " 6<&1
+        read -p "123" copies 
         arr=(${DESTINATION_DIR}/[0-9].tar.gz)
         for ((a=${#arr[*]}; a >= $copies; a--)) do
         rm -f $DESTINATION_DIR/$a.tar.gz
+        err >&2
         done
         for ((a=${#arr[*]}; a > "0"; a--)) do
           $(mv ${arr[$a-1]} $DESTINATION_DIR/$a.tar.gz >& /dev/null)
           rm -f $DESTINATION_DIR/$copies.tar.gz
         done
-        $(tar -czpf $DESTINATION_DIR/0.tar.gz -P -C $SOURCE_DIR . >& /dev/null)
+        $(tar -czpf $DESTINATION_DIR/0.tar.gz -P -C $PARENT_SOURCE $(basename $SOURCE_DIR) >& /dev/null)
 
         break 2;;
       *) echo "Try again";;
@@ -92,6 +93,9 @@ copyfile () {
   fi
 }
 
+err () {
+  echo "1"
+}
 
 main () {
   the_same_names "$SOURCE_DIR" "$DESTINATION_DIR"
@@ -99,4 +103,12 @@ main () {
   copy_archive
 }
 
-main
+  # ERROR=$(main 2>&1 | tee >(wc -l) > /dev/null)
+  # if [ $ERROR -ne 0 ] 
+  # then
+  #   echo -e "\033[31m Warning: $ERROR error(s) occurred!"
+  # fi
+
+#main #2> /dev/null
+main  2>&1 6>&1| tee >(wc -l) > /dev/null
+
