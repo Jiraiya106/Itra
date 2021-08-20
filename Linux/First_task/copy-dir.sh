@@ -40,7 +40,6 @@ get_dir_space () {
 archive_and_cleanup () {
   case $choice_d_or_r in 
     D | d)
-      echo $SOURCE_DIR/ 
       tar  -czpf $DESTINATION_DIR/$DATE_FORMAT.tar.gz  -C $PARENT_SOURCE $(basename $SOURCE_DIR) 1>& out_$DATE_FORMAT.log
       ;;
     R | r)
@@ -64,6 +63,7 @@ file_archiving () {
 
   if [ "$SOURCE_DIR_SIZE" -lt "$DEST_FREE_DISK" ] 
   then
+    archive_and_cleanup
     NUMBER_ERROR=$(archive_and_cleanup 2>&1 | tee >(wc -l) > /dev/null) && cat out_$DATE_FORMAT.log
   else
     while true; do
