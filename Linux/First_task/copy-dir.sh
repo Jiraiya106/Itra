@@ -4,7 +4,7 @@ SOURCE_DIR=$(realpath "$1")
 DESTINATION_DIR=$(realpath "$2")
 DATE_FORMAT=$(date +%Y%m%d_%H%S)
 
-the_same_names () {
+compare_dir_paths () {
   if [ "$1" == "$2" ]
   then
     echo "The same names"
@@ -17,7 +17,7 @@ get_free_disk_space () {
   df "$1" | tail -1 | awk '{print$4}'
 }
 
-directoryproblem () {
+is_directory_parentine () {
   PARENT_SOURCE=$(dirname "$1")
   PARENT_DESTINATION=$(dirname "$2")
 
@@ -28,6 +28,7 @@ directoryproblem () {
   elif [ "$2" == "$PARENT_SOURCE" ]
   then 
     echo ""$1" parent directory "$2""
+    exit 0
   fi
 }
 
@@ -36,53 +37,40 @@ get_dir_space () {
   du -s "$1" | awk '{print$1}'
 }
 
-#Copy direct
-copyall () {
-  cp -p -r $1 $2
+archive_and_cleanup () {
+  case $choice_d_or_r in 
+    D | d)
+      echo $SOURCE_DIR/ 
+      tar  -czpf $DESTINATION_DIR/$DATE_FORMAT.tar.gz  -C $PARENT_SOURCE $(basename $SOURCE_DIR) 1>& out_$DATE_FORMAT.log
+      ;;
+    R | r)
+      arr=(${DESTINATION_DIR}/[0-9].tar.gz)
+      for ((a=${#arr[*]}; a >= $copies; a--)) do
+        rm $DESTINATION_DIR/$a.tar.gz 1>& out_$DATE_FORMAT.log
+      done
+      for ((a=${#arr[*]}; a > "0"; a--)) do
+        $(mv ${arr[$a-1]} $DESTINATION_DIR/$a.tar.gz 1>& out_$DATE_FORMAT.log)
+        rm $DESTINATION_DIR/$copies.tar.gz 1>& out_$DATE_FORMAT.log
+      done
+      $(tar -czpf $DESTINATION_DIR/0.tar.gz -P -C $PARENT_SOURCE $(basename $SOURCE_DIR) 1>& out_$DATE_FORMAT.log)
+      ;;
+    *) echo "Try again";;
+  esac
 }
 
-copy_archive () {
-  # while true;do
-  #   echo "We use the date(D) or rotation(R)?"
-  #   read -p "" answer_d_or_r
-    case $answer_d_or_r in 
-      D | d)
-        echo $SOURCE_DIR/ 
-        tar  -czpf $DESTINATION_DIR/$DATE_FORMAT.tar.gz  -C $PARENT_SOURCE $(basename $SOURCE_DIR) 1>& out_$DATE_FORMAT.log
-        ;;
-      R | r)
-        # echo "Maximum number of copies "
-        # read -p "123" copies 
-        arr=(${DESTINATION_DIR}/[0-9].tar.gz)
-        for ((a=${#arr[*]}; a >= $copies; a--)) do
-        rm -f $DESTINATION_DIR/$a.tar.gz
-        err >&2
-        done
-        for ((a=${#arr[*]}; a > "0"; a--)) do
-          $(mv ${arr[$a-1]} $DESTINATION_DIR/$a.tar.gz >& /dev/null)
-          rm -f $DESTINATION_DIR/$copies.tar.gz
-        done
-        $(tar -czpf $DESTINATION_DIR/0.tar.gz -P -C $PARENT_SOURCE $(basename $SOURCE_DIR) >& /dev/null)
+file_archiving () {
+  DEST_FREE_DISK=$(get_free_disk_space $2)
+  SOURCE_DIR_SIZE=$(get_dir_space $1)
 
-        ;;
-      *) echo "Try again";;
-    esac
-  # done
-}
-
-copyfile () {
-  FREE_DISK_DEST=$(get_free_disk_space $2)
-  DIR_SPACE_SOURCE=$(get_dir_space $1)
-
-  if [ "$DIR_SPACE_SOURCE" -lt "$FREE_DISK_DEST" ] 
+  if [ "$SOURCE_DIR_SIZE" -lt "$DEST_FREE_DISK" ] 
   then
-    copy_archive
+    NUMBER_ERROR=$(archive_and_cleanup 2>&1 | tee >(wc -l) > /dev/null) && cat out_$DATE_FORMAT.log
   else
     while true; do
-      read -p "Not enough no free space disk. Continue?(Y/N)" answer_y_or_n
-      case "$answer_y_or_n" in
+      read -p "Not enough no free space disk. Continue?(Y/N)" choice_y_or_n
+      case "$choice_y_or_n" in
         Y | y) 
-          copy_archive
+          NUMBER_ERROR=$(archive_and_cleanup 2>&1 | tee >(wc -l) > /dev/null) && cat out_$DATE_FORMAT.log
           break 2;;
         N | n) 
           exit 0;;
@@ -93,38 +81,34 @@ copyfile () {
   fi
 }
 
-err () {
-  echo "1"
-}
-
 main () {
-  the_same_names "$SOURCE_DIR" "$DESTINATION_DIR"
-  directoryproblem "$SOURCE_DIR" "$DESTINATION_DIR"
-  copy_archive
+  compare_dir_paths "$SOURCE_DIR" "$DESTINATION_DIR"
+  is_directory_parentine "$SOURCE_DIR" "$DESTINATION_DIR"
+  
+  while true;do
+    echo "We use the date(D) or rotation(R)?"
+    read -p "" choice_d_or_r
+      case $choice_d_or_r in 
+        D | d) 
+          choice_d_or_r=D
+          break 2;;
+        R | r) 
+          choice_d_or_r=R
+          echo "Maximum number of copies "
+          read -p "" copies 
+          break 2;;
+        *) echo "Try again";;
+      esac
+  done
+  
+  file_archiving "$SOURCE_DIR" "$DESTINATION_DIR"
+  find out_*.log -type f -empty -exec rm {} \;
+  if [ $NUMBER_ERROR -ne 0 ] 
+  then
+    echo -e "\033[31mWarning: $NUMBER_ERROR error(s) occurred!"
+  fi
 }
 
-while true;do
-  echo "We use the date(D) or rotation(R)?"
-  read -p "" answer_d_or_r
-    case $answer_d_or_r in 
-      D | d) 
-        answer_d_or_r=D
-        break 2;;
-      R | r) 
-        answer_d_or_r=R
-        echo "Maximum number of copies "
-        read -p "" copies 
-        break 2;;
-      *) echo "Try again";;
-    esac
-done
 
-ERROR=$(main 2>&1 | tee >(wc -l) > /dev/null) && cat out_$DATE_FORMAT.log
-if [ $ERROR -ne 0 ] 
-then
-  echo -e "\033[31mWarning: $ERROR error(s) occurred!"
-fi
-
-#main #2> /dev/null
-#main  2>&1 6>&1| tee >(wc -l) > /dev/null
+main 
 
