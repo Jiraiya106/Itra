@@ -42,17 +42,17 @@ copyall () {
 }
 
 copy_archive () {
-  while true;do
-    echo "We use the date(D) or rotation(R)?"
-    read -p "" answer
-    case $answer in 
+  # while true;do
+  #   echo "We use the date(D) or rotation(R)?"
+  #   read -p "" answer_d_or_r
+    case $answer_d_or_r in 
       D | d)
         echo $SOURCE_DIR/ 
-        tar  -czpf $DESTINATION_DIR/$DATE_FORMAT.tar.gz  -C $PARENT_SOURC $(basename $SOURCE_DIR) 1>& out_$DATE_FORMAT.log && cat out_$DATE_FORMAT.log
-        break 2;;
+        tar  -czpf $DESTINATION_DIR/$DATE_FORMAT.tar.gz  -C $PARENT_SOURCE $(basename $SOURCE_DIR) 1>& out_$DATE_FORMAT.log
+        ;;
       R | r)
-        echo "Maximum number of copies " 6<&1
-        read -p "123" copies 
+        # echo "Maximum number of copies "
+        # read -p "123" copies 
         arr=(${DESTINATION_DIR}/[0-9].tar.gz)
         for ((a=${#arr[*]}; a >= $copies; a--)) do
         rm -f $DESTINATION_DIR/$a.tar.gz
@@ -64,10 +64,10 @@ copy_archive () {
         done
         $(tar -czpf $DESTINATION_DIR/0.tar.gz -P -C $PARENT_SOURCE $(basename $SOURCE_DIR) >& /dev/null)
 
-        break 2;;
+        ;;
       *) echo "Try again";;
     esac
-  done
+  # done
 }
 
 copyfile () {
@@ -79,8 +79,8 @@ copyfile () {
     copy_archive
   else
     while true; do
-      read -p "Not enough no free space disk. Continue?(Y/N)" answer
-      case "$answer" in
+      read -p "Not enough no free space disk. Continue?(Y/N)" answer_y_or_n
+      case "$answer_y_or_n" in
         Y | y) 
           copy_archive
           break 2;;
@@ -103,12 +103,28 @@ main () {
   copy_archive
 }
 
-  # ERROR=$(main 2>&1 | tee >(wc -l) > /dev/null)
-  # if [ $ERROR -ne 0 ] 
-  # then
-  #   echo -e "\033[31m Warning: $ERROR error(s) occurred!"
-  # fi
+while true;do
+  echo "We use the date(D) or rotation(R)?"
+  read -p "" answer_d_or_r
+    case $answer_d_or_r in 
+      D | d) 
+        answer_d_or_r=D
+        break 2;;
+      R | r) 
+        answer_d_or_r=R
+        echo "Maximum number of copies "
+        read -p "" copies 
+        break 2;;
+      *) echo "Try again";;
+    esac
+done
+
+ERROR=$(main 2>&1 | tee >(wc -l) > /dev/null) && cat out_$DATE_FORMAT.log
+if [ $ERROR -ne 0 ] 
+then
+  echo -e "\033[31mWarning: $ERROR error(s) occurred!"
+fi
 
 #main #2> /dev/null
-main  2>&1 6>&1| tee >(wc -l) > /dev/null
+#main  2>&1 6>&1| tee >(wc -l) > /dev/null
 

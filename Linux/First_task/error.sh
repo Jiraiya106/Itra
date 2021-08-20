@@ -11,11 +11,13 @@ err () {
 }
 
 main () {
-    std >& std.log
+    exec 3>std.log
+    std >&3
     err >&2
-    echo "34"
+    read -p "123" cop
+    echo "$cop"
 }
 
-YOU=$(main 2>&1 | tee >(wc -l) > /dev/null)
+main 2>&2 | tee >(wc -l) > dev/null
 echo "YOU: $YOU"
-main 2> /dev/null
+#main 2> /dev/null
