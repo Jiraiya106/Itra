@@ -1,3 +1,5 @@
 Docker-Compose/First task/data
 Docker-Compose/First task/log/mysql
 Kubernetes/First task/docker-hello-world
+Terraform/First_task/.terraform
+Terraform/First_task/.terraform.lock.hcl
