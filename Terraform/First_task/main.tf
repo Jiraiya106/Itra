@@ -1,16 +1,7 @@
-# terraform {
-#    required_providers {
-#     aws = {
-#       source   =  "hashicorp/aws" 
-#       version =  " 2.70.0 "
-#     }
-#   }
-# }
-
 provider "aws" {
-  access_key = ""
-  secret_key = ""
-  region = "eu-central-1"
+  access_key = var.access_key
+  secret_key = var.secret_key
+  region = var.region
 
 }
 
@@ -18,6 +9,21 @@ provider "aws" {
 resource "aws_instance" "my_ubuntu" {
   ami = ""
   instance_type = "t2.micro"
+  user_data = <<EOF
+#!/bin/bash
+"wget -q -O - https://pkg.jenkins.io/debian-stable/jenkins.io.key | sudo apt-key add -",
+"sudo sh -c 'echo deb http://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list'",
+"sudo apt update -qq",
+"sudo apt install -y default-jre",
+"sudo apt install -y jenkins",
+"sudo systemctl start jenkins",
+"sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 8080",
+"sudo sh -c \"iptables-save > /etc/iptables.rules\"",
+"echo iptables-persistent iptables-persistent/autosave_v4 boolean true | sudo debconf-set-selections",
+"echo iptables-persistent iptables-persistent/autosave_v6 boolean true | sudo debconf-set-selections",
+"sudo apt-get -y install iptables-persistent",
+"sudo ufw allow 8080",
+EOF
 }
 
 #VPC
@@ -38,7 +44,7 @@ resource "aws_subnet" "main" {
 #RDS
 resource "aws_db_instance" "education" {  
 	identifier             = "education"
-	instance_class         = "db.t3.micro"
+	instance_class         = "db.t2.micro"
 	allocated_storage      = 5
 	engine                 = "postgres"
 	engine_version         = "13.1"
@@ -77,26 +83,24 @@ resource "aws_security_group" "allow_tls" {
   description = "Allow TLS inbound traffic"
   vpc_id      = aws_vpc.aws_vpc.id
 
-  ingress = [
-    {
-      description      = "TLS from VPC"
-      from_port        = 443
-      to_port          = 443
+  dynamic "ingress" {
+  for_each = ["80", "443", "8080", "1541", "9092"]
+    content {
+      from_port        = ingress.value
+      to_port          = ingress.value
       protocol         = "tcp"
-      cidr_blocks      = [aws_vpc.main.cidr_block]
-      ipv6_cidr_blocks = [aws_vpc.main.ipv6_cidr_block]
-    }
-  ]
-
-  egress = [
-    {
+      cidr_blocks      = ["0.0.0.0/0"]
+    }  
+  }
+  
+  egress  {
       from_port        = 0
       to_port          = 0
       protocol         = "-1"
       cidr_blocks      = ["0.0.0.0/0"]
       ipv6_cidr_blocks = ["::/0"]
     }
-  ]
+  
 
   tags = {
     Name = "allow_tls"
