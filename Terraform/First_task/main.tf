@@ -24,13 +24,9 @@ resource "aws_subnet" "private_subnet" {
   }
 }
 
-resource "aws_subnet" "private_subnet_2" {
-  vpc_id     = aws_vpc.aws_vpc.id
-  cidr_block = "10.0.2.0/24"
-
-  tags = {
-    Name = "my_private_subnet_2"
-  }
+resource "aws_nat_gateway" "example" {
+  connectivity_type = "private"
+  subnet_id         = aws_subnet.private_subnet.id
 }
 
 #EC2-App
@@ -62,7 +58,7 @@ resource "aws_security_group" "allow_tls_app" {
       from_port        = 22
       to_port          = 22
       protocol         = "tcp"
-      cidr_blocks      = [aws_instance.bastion.ipv4] # Уточнить блок при создании bastion
+      cidr_blocks      = ["0.0.0.0/0"] # Уточнить блок при создании bastion
   }   
 
   egress  {
@@ -119,13 +115,16 @@ resource "aws_security_group" "db_sq" {
 #EC2-instance bastion
 
 resource "aws_instance" "bastion" {
-  ami                         = "ami-969ab1f6"
-  key_name                    = "${aws_key_pair.bastion_key.key_name}"
+  ami                         = "ami-05f7491af5eef733a"
+  key_name                    = aws_key_pair.bastion_key.key_name
   instance_type               = "t2.micro"
-  security_groups             = ["${aws_security_group.bastion-sg.name}"]
+  security_groups             = [aws_security_group.bastion-sg.name]
   associate_public_ip_address = true
   user_data                   = file("jenkins.sh")
+
+  tags = merge({ Name = "${var.common-tags["Name"]}-bastion"})
 }
+
 
 resource "aws_security_group" "bastion-sg" {
   name   = "bastion-security-group"
