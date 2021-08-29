@@ -1,4 +1,3 @@
-
 variable "access_key" {
   description = "Access key"
   type        = string
@@ -11,7 +10,7 @@ variable "secret_key" {
 
 variable "region" {
   description = "Region"
-  default = "eu-central-1"
+  default = "eu-west-1"
 }
 
 variable "common-tags" {
@@ -42,4 +41,26 @@ variable "db_username" {
 variable "db_password" {
   description = "DB password"
   default = ""
+}
+
+variable "environment" {
+  description = "environment"
+  default = "My terraform"
+}
+
+variable "vpc_cidr" {
+  description = "VPC"
+  default = "10.0.0.0/16"
+}
+
+variable "public_subnets_cidr" {
+  description = "public"
+  type = list
+  default = ["10.0.1.0/24", "10.0.3.0/24"]
+}
+
+variable "private_subnets_cidr" {
+  description = "private"
+  type = list
+  default = ["10.0.2.0/24"]
 }
