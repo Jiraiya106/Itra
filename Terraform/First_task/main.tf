@@ -136,6 +136,13 @@ resource "aws_lb_listener" "my-alb-listner" {
     target_group_arn = aws_lb_target_group.target-group.arn
   }
 }
+
+resource "aws_lb_target_group_attachment" "test" {
+  target_group_arn = aws_lb_target_group.target-group.arn
+  target_id        = aws_instance.instance-app.id
+  port             = 80
+}
+
 /*==== VPC's Default Security Group ======*/
 resource "aws_security_group" "default" {
   name        = "${var.environment}-default-sg"
@@ -163,7 +170,7 @@ resource "aws_security_group" "default" {
 #EC2-instance bastion
 
 resource "aws_instance" "bastion" {
-  ami                         = "ami-0a8e758f5e873d1c1"
+  ami                         = "ami-0194c3e07668a7e36"
   key_name                    = aws_key_pair.bastion_key.key_name
   instance_type               = "t2.micro"
   vpc_security_group_ids      = [aws_security_group.bastion_sg.id]
@@ -205,9 +212,9 @@ output "bastion_public_ip" {
 
 #EC2-App
 resource "aws_instance" "instance-app" {
-  ami = "ami-0a8e758f5e873d1c1"
+  ami = "ami-0194c3e07668a7e36"
   instance_type = "t2.micro"
-  subnet_id = aws_subnet.private_subnet.0.id
+  subnet_id = aws_subnet.private_subnet.0.id 
   vpc_security_group_ids = [ aws_security_group.allow_tls_app.id ]
   user_data = <<EOF
 #!/bin/bash
@@ -233,7 +240,7 @@ resource "aws_security_group" "allow_tls_app" {
       from_port        = ingress.value
       to_port          = ingress.value
       protocol         = "tcp"
-      cidr_blocks      = ["0.0.0.0/0"] # Уточнить блоки при создании ALB
+      cidr_blocks      = ["0.0.0.0/24"] # Уточнить блоки при создании ELB
     }  
   }
   
@@ -270,7 +277,7 @@ resource "aws_db_instance" "my-db" {
   parameter_group_name = "default.mysql5.7"
   vpc_security_group_ids = [ aws_security_group.db_sq.id ]
   skip_final_snapshot = "true"
-  
+
   tags = merge({ Name = "${var.common-tags["Name"]}-db"})
 }
 

@@ -10,7 +10,7 @@ variable "secret_key" {
 
 variable "region" {
   description = "Region"
-  default = "eu-west-1"
+  default = "eu-west-2"
 }
 
 variable "common-tags" {
