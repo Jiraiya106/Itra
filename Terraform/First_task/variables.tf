@@ -27,6 +27,13 @@ variable "allow_port_app" {
   default = ["80", "443"]
 }
 
+variable "allow_port_alb" {
+  description = "Open port for App"
+  type = list
+  default = ["80", "443"]
+}
+
+
 variable "allow_port_db" {
   description = "Open port for DB"
   type = list

@@ -108,10 +108,8 @@ resource "aws_lb" "my-alb" {
   name               = "my-alb-tf"
   internal           = false
   load_balancer_type = "application"
-  security_groups    = [aws_security_group.default.id]
+  security_groups    = [aws_security_group.allow_tls_alb.id]
   subnets            = aws_subnet.public_subnet.*.id
-
-  enable_deletion_protection = true
 
   tags = {
     Environment = "production"
@@ -141,6 +139,35 @@ resource "aws_lb_target_group_attachment" "test" {
   target_group_arn = aws_lb_target_group.target-group.arn
   target_id        = aws_instance.instance-app.id
   port             = 80
+}
+
+resource "aws_security_group" "allow_tls_alb" {
+  name        = "allow_tls_alb"
+  description = "Allow TLS inbound traffic"
+  vpc_id      = aws_vpc.aws_vpc.id
+
+  dynamic "ingress" {
+  for_each = var.allow_port_alb
+    content {
+      from_port        = ingress.value
+      to_port          = ingress.value
+      protocol         = "tcp"
+      cidr_blocks      = ["0.0.0.0/0"] # Уточнить блоки при создании ELB
+    }  
+  }  
+
+  egress  {
+      from_port        = 0
+      to_port          = 0
+      protocol         = "-1"
+      cidr_blocks      = ["0.0.0.0/0"]
+      ipv6_cidr_blocks = ["::/0"]
+    }
+  
+
+  tags = {
+    Name = "allow_port_alb"
+  }
 }
 
 /*==== VPC's Default Security Group ======*/
@@ -174,7 +201,6 @@ resource "aws_instance" "bastion" {
   key_name                    = aws_key_pair.bastion_key.key_name
   instance_type               = "t2.micro"
   vpc_security_group_ids      = [aws_security_group.bastion_sg.id]
-#  security_groups             = aws_security_group.bastion_sg.name
   associate_public_ip_address = true
   subnet_id                   = aws_subnet.public_subnet.1.id
   user_data                   = file("jenkins.sh")
@@ -212,20 +238,13 @@ output "bastion_public_ip" {
 
 #EC2-App
 resource "aws_instance" "instance-app" {
-  ami = "ami-0194c3e07668a7e36"
-  instance_type = "t2.micro"
-  subnet_id = aws_subnet.private_subnet.0.id 
+  ami                    = "ami-0194c3e07668a7e36"
+  key_name               = aws_key_pair.bastion_key.key_name
+  instance_type          = "t2.micro"
+  subnet_id              = aws_subnet.private_subnet.0.id 
   vpc_security_group_ids = [ aws_security_group.allow_tls_app.id ]
-  user_data = <<EOF
-#!/bin/bash
-yum -y update
-yum -y install httpd
-myip=`cupl http://169.254.169.254/latest/meta-data/local-ipv4` > /var/www/html/index.html
-echo "<h2>WebServer with IP: $myip</h2> Build by Terraform" >> /var/www/html/index.html
-sudo service httpd start
-chkconfig httpd on
-EOF
-  tags = merge({ Name = "${var.common-tags["Name"]}-app"})
+  user_data              = file("apache.sh")
+  tags                   = merge({ Name = "${var.common-tags["Name"]}-app"})
 }
 
 #Security group EC2-App
@@ -240,7 +259,7 @@ resource "aws_security_group" "allow_tls_app" {
       from_port        = ingress.value
       to_port          = ingress.value
       protocol         = "tcp"
-      cidr_blocks      = ["0.0.0.0/24"] # Уточнить блоки при создании ELB
+      cidr_blocks      = ["0.0.0.0/0"] # Уточнить блоки при создании ELB
     }  
   }
   
