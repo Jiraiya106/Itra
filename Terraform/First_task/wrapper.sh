@@ -22,15 +22,15 @@ dev_or_prod_or_stage () {
       case $choice_d_or_p_or_s in 
         P | p | prod) 
           terraform workspace select prod
-          terraform apply --var-file prod.tfvars 
+          terraform $choice_a_or_d --var-file prod.tfvars 
           break 2;;
         D | d | dev) 
           terraform workspace select dev
-          terraform apply --var-file dev.tfvars 
+          terraform $choice_a_or_d --var-file dev.tfvars 
           break 2;;
         S | s | stage) 
           terraform workspace select stage
-          terraform apply --var-file stage.tfvars 
+          terraform $choice_a_or_d --var-file stage.tfvars 
           break 2;;
         *) echo "Try again";;
       esac
