@@ -4,4 +4,6 @@ Kubernetes/First task/docker-hello-world
 Terraform/First_task/.terraform
 Terraform/First_task/.terraform.lock.hcl
 Terraform/First_task/example
-Terraform/First_task/terraform.tfvars
+Terraform/First_task/dev.tfvars
+Terraform/First_task/stage.tfvars
+Terraform/First_task/prod.tfvars
