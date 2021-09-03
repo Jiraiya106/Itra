@@ -36,3 +36,10 @@ dev_or_prod_or_stage () {
       esac
   done      
 }
+
+main () {
+  apply_or_destroy
+  dev_or_prod_or_stage
+}
+
+main
