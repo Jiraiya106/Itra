@@ -1,7 +1,16 @@
+data "aws_ami" "ubuntu_20" {
+  owners = ["099720109477"]
+  most_recent = true
+  filter {
+    name = "name"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-arm64-server-*"]
+  }
+}
+
 #EC2-instance bastion
 
 resource "aws_instance" "bastion" {
-  ami                         = "ami-0194c3e07668a7e36"
+  ami                         = data.aws_ami.ubuntu_20.id
   key_name                    = aws_key_pair.bastion_key.key_name
   instance_type               = "t2.micro"
   vpc_security_group_ids      = [aws_security_group.bastion_sg.id]
