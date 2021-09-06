@@ -7,3 +7,6 @@ Terraform/First_task/example
 Terraform/First_task/dev.tfvars
 Terraform/First_task/stage.tfvars
 Terraform/First_task/prod.tfvars
+Terraform/First_task/terraform.tfvars
+Terraform/First_task/modules/elasticache
+Terraform/First_task/modules/elasticache1

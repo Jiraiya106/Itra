@@ -10,6 +10,9 @@ apply_or_destroy () {
         D | d | destroy) 
           choice_a_or_d=destroy
           break 2;;
+        i) 
+        choice_a_or_d=apply
+          break 2;;
         *) echo "Try again";;
       esac
   done
