@@ -10,7 +10,7 @@ data "aws_ami" "ubuntu_20" {
 #EC2-instance bastion
 
 resource "aws_instance" "bastion" {
-  ami                         = data.aws_ami.ubuntu_20.id
+  ami                         = "ami-0194c3e07668a7e36"
   key_name                    = aws_key_pair.bastion_key.key_name
   instance_type               = "t2.micro"
   vpc_security_group_ids      = [aws_security_group.bastion_sg.id]
@@ -45,19 +45,99 @@ resource "aws_key_pair" "bastion_key" {
   public_key = var.ssh_public_key
 }
 
-output "bastion_public_ip" {
-  value = "${aws_instance.bastion.public_ip}"
+#EC2-App
+data "template_file" "phpconfig" {
+  template = file("files/conf.wp-config.php")
+
+  vars = {
+    db_port = aws_db_instance.my-db.port
+    db_host = aws_db_instance.my-db.address
+    db_user = var.db_username
+    db_pass = var.db_password
+    db_name = var.db_name
+  }
 }
 
-#EC2-App
 resource "aws_instance" "instance-app" {
-  ami                    = "ami-0194c3e07668a7e36"
+  ami                    = data.aws_ami.ubuntu_20.id
   key_name               = aws_key_pair.bastion_key.key_name
   instance_type          = "t2.micro"
+
+  depends_on = [
+    aws_db_instance.my-db,
+  ]  
+
   subnet_id              = aws_subnet.private_subnet.0.id 
   vpc_security_group_ids = [ aws_security_group.allow_tls_app.id ]
-  user_data              = file("apache.sh")
+  user_data              = file("files/userdata.sh")
   tags                   = merge({ Name = "${var.common-tags["Name"]}-app"})
+
+provisioner "file" {
+    source      = "./files/userdata.sh"
+    destination = "/tmp/userdata.sh"
+
+    connection {
+      type        = "ssh"
+      user        = "ubuntu"
+      host        = self.private_ip
+      bastion_host = aws_instance.bastion.public_ip
+      bastion_host_key = aws_key_pair.bastion_key.key_name
+      bastion_user = "ubuntu"
+      private_key = file(var.ssh_priv_key)
+    }
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "chmod +x /tmp/userdata.sh",
+      "/tmp/userdata.sh",
+    ]
+
+    connection {
+      type        = "ssh"
+      user        = "ubuntu"
+      host        = self.private_ip
+      bastion_host = aws_instance.bastion.public_ip
+      bastion_host_key = aws_key_pair.bastion_key.key_name
+      bastion_user = "ubuntu"
+      private_key = file(var.ssh_priv_key)
+    }
+  }
+
+  provisioner "file" {
+    content     = data.template_file.phpconfig.rendered
+    destination = "/tmp/wp-config.php"
+
+    connection {
+      type        = "ssh"
+      user        = "ubuntu"
+      host        = self.private_ip
+      bastion_host = aws_instance.bastion.public_ip
+      bastion_host_key = aws_key_pair.bastion_key.key_name
+      bastion_user = "ubuntu"
+      private_key = file(var.ssh_priv_key)
+    }
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "sudo cp /tmp/wp-config.php /var/www/html/wp-config.php",
+    ]
+
+    connection {
+      type        = "ssh"
+      user        = "ubuntu"
+      host        = self.private_ip
+      bastion_host = aws_instance.bastion.public_ip
+      bastion_host_key = aws_key_pair.bastion_key.key_name
+      bastion_user = "ubuntu"
+      private_key = file(var.ssh_priv_key)
+    }
+  }
+
+  timeouts {
+    create = "20m"
+  }
 }
 
 #Security group EC2-App

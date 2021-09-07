@@ -50,6 +50,11 @@ variable "db_password" {
   default     = ""
 }
 
+variable db_name {
+  description = "db name"
+  default = "mydb"
+}
+
 variable "environment" {
   description = "environment"
   default     = "My terraform"
@@ -70,6 +75,16 @@ variable "private_subnets_cidr" {
   description = "private"
   type        = list
   default     = ["10.0.2.0/24"]
+}
+
+variable ssh_key {
+  default     = "~/.ssh/id_rsa.pub"
+  description = "Default pub key"
+}
+
+variable ssh_priv_key {
+  default     = "~/.ssh/id_rsa"
+  description = "Default private key"
 }
 
 variable "ssh_public_key" {
