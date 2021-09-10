@@ -1,5 +1,6 @@
 #!/bin/bash
-sudo echo "127.0.0.1 `hostname`" >> /etc/hosts
+sudo apt-get update -y
+sudo apt-get upgrade -y
 sudo apt-get update -y
 sudo apt-get upgrade -y
 sudo apt-get install mysql-client -y
@@ -16,6 +17,7 @@ sudo rsync -av wordpress/* /var/www/html/
 sudo chown -R www-data:www-data /var/www/html/
 sudo chmod -R 755 /var/www/html/
 sudo cp /var/www/html/wp-config-sample.php /var/www/html/wp-config.php
-#sudo rm /var/www/html/index.html
+sudo mkdir -p /var/www/html/wp-content/mu-plugins/
+sudo rm /var/www/html/index.html
 sudo systemctl restart apache2
 sleep 20

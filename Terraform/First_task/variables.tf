@@ -91,3 +91,8 @@ variable "ssh_public_key" {
   description = "ssh_public_key"
   default     = ""
 }
+
+variable "env" {
+  type = string
+  default = ""
+}

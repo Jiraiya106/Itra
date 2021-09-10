@@ -10,7 +10,7 @@ data "aws_ami" "ubuntu_20" {
 #EC2-instance bastion
 
 resource "aws_instance" "bastion" {
-  ami                         = "ami-0194c3e07668a7e36"
+  ami                         = data.aws_ami.ubuntu_20.id
   key_name                    = aws_key_pair.bastion_key.key_name
   instance_type               = "t2.micro"
   vpc_security_group_ids      = [aws_security_group.bastion_sg.id]
@@ -41,7 +41,7 @@ resource "aws_security_group" "bastion_sg" {
 }
 
 resource "aws_key_pair" "bastion_key" {
-  key_name   = "your_key_name"
+  key_name   = "your_key_name-${var.env}"
   public_key = var.ssh_public_key
 }
 
@@ -134,6 +134,39 @@ provisioner "file" {
       private_key = file(var.ssh_priv_key)
     }
   }
+
+provisioner "file" {
+    source     = "./files/create-admin-user.php"
+    destination = "/tmp/create-admin-user.php"
+
+    connection {
+      type        = "ssh"
+      user        = "ubuntu"
+      host        = self.private_ip
+      bastion_host = aws_instance.bastion.public_ip
+      bastion_host_key = aws_key_pair.bastion_key.key_name
+      bastion_user = "ubuntu"
+      private_key = file(var.ssh_priv_key)
+    }
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "sudo cp /tmp/create-admin-user.php /var/www/html/wp-content/mu-plugins/create-admin-user.php",
+    ]
+
+    connection {
+      type        = "ssh"
+      user        = "ubuntu"
+      host        = self.private_ip
+      bastion_host = aws_instance.bastion.public_ip
+      bastion_host_key = aws_key_pair.bastion_key.key_name
+      bastion_user = "ubuntu"
+      private_key = file(var.ssh_priv_key)
+    }
+  }
+
+
 
   timeouts {
     create = "20m"

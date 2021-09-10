@@ -11,7 +11,7 @@ apply_or_destroy () {
           choice_a_or_d=destroy
           break 2;;
         i) 
-        choice_a_or_d=apply
+        choice_a_or_d=init
           break 2;;
         *) echo "Try again";;
       esac
