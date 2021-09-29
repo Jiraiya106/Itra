@@ -1,6 +1,7 @@
 Docker-Compose/First task/data
 Docker-Compose/First task/log/mysql
 Kubernetes/First task/docker-hello-world
+
 Terraform/First_task/.terraform
 Terraform/First_task/.terraform.lock.hcl
 Terraform/First_task/example
@@ -11,3 +12,6 @@ Terraform/First_task/terraform.tfvars
 Terraform/First_task/modules/elasticache
 Terraform/First_task/modules/elasticache1
 Terraform/First_task/files/functions.php
+Linux/First_task/123
+Linux/First_task/456
+Linux/First_task/error.sh
