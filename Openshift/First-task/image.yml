@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ImageStream
+metadata:
+   annotations:
+      openshift.io/generated-by: OpenShiftNewApp
+   generation: 1
+   labels:
+      app: ruby-sample-build
+   selflink: /oapi/v1/namespaces/test/imagestreams/origin-ruby-sample
+   uid: ee2b9405-c68c-11e5-8a99-525400f25e34
+spec: {}
+status:
+  dockerImageRepository: 172.30.56.218:5000/test/origin-ruby-sample
+  tags:
+  - items:
+      - created: 2016-01-29T13:40:11Z
+        dockerImageReference: 172.30.56.218:5000/test/origin-apache-sample
+        generation: 1
+        image: vklnld908.int.clsa.com/vipin/test
+    tag: latest

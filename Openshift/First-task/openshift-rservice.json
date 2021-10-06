@@ -1,0 +1,13 @@
+{
+   "kind": "Route",
+   "apiVersion": "v1",
+   "metadata": {"name": "openshift-service-route"},
+   "spec": {
+      "host": "hello-openshift.cloudapps.example.com",
+      "to": {
+         "kind": "Service",
+         "name": "OpenShift-route-service"
+      },
+      "tls": {"termination": "edge"}
+   }
+}

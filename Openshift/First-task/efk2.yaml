@@ -17,7 +17,7 @@ spec:
     elasticsearch:
       nodeCount: 3 
       storage:
-        storageClassName: "Elastic" 
+        storageClassName: "<storage_class_name>" 
         size: 200G
       resources: 
         requests:
@@ -36,4 +36,10 @@ spec:
   collection:
     logs:
       type: "fluentd"  
-      fluentd: {}
+      fluentd: 
+        resources:
+          limits: 
+            memory: 736Mi
+          requests:
+            cpu: 100m
+            memory: 736Mi
