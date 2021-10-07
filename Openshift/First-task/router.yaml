@@ -1,54 +1,41 @@
-apiVersion: apps/v1
-kind: Deployment
+kind: Route
+apiVersion: route.openshift.io/v1
 metadata:
-  name: ingress-router
-  namespace: "elastic"
+  name: example1
+spec:
+  host: example.local
+  wildcardPolicy: None
+  to:
+    name: example
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: example1
+spec:
+  selector:
+    k8s-app: example
+  ports:
+  - port: 80
+    targetPort: 8080
+---
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: example1
   labels:
-    k8s-app: ingress-router
+    k8s-app: example
 spec:
   selector:
     matchLabels:
-      k8s-app: ingress-router
+      k8s-app: example
   template:
     metadata:
       labels:
-        k8s-app: ingress-router
+        k8s-app: example
     spec:
-      serviceAccountName: ingress-router
       containers:
-      - env:
-        - name: ROUTER_LISTEN_ADDR
-          value: 0.0.0.0:9200
-        - name: ROUTER_METRICS_TYPE
-          value: haproxy
-        - name: ROUTER_SERVICE_HTTPS_PORT
-          value: "443"
-        - name: ROUTER_SERVICE_HTTP_PORT
-          value: "80"
-        - name: ROUTER_THREADS
-          value: "4"
-        image: openshift/origin-haproxy-router:v4.0.0
-        livenessProbe:
-          httpGet:
-            host: localhost
-            path: /healthz
-            port: 9200
-          initialDelaySeconds: 10
-        name: router
+      - image: openshift/deployment-example:v1
+        name: web
         ports:
-        - containerPort: 9200
-        - containerPort: 5601
-        - containerPort: 1936
-          name: stats
-          protocol: TCP
-        readinessProbe:
-          httpGet:
-            host: localhost
-            path: healthz/ready
-            port: 5601
-          initialDelaySeconds: 10
-        resources:
-          requests:
-            cpu: 100m
-            memory: 256Mi
-      hostNetwork: true
+        - containerPort: 8080
