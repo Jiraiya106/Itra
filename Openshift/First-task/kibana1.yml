@@ -28,3 +28,17 @@ spec:
   to: 
     kind: Service 
     name: kibana-kb-http
+---
+apiVersion: config.openshift.io/v1
+kind: Proxy
+metadata:
+  name: kibana
+spec:
+  httpProxy: http://kibana:kibana@192.168.40.40:5601 
+  httpsProxy: http://kibana:kibana@192.168.40.40:5601 
+  noProxy: example.com 
+  readinessEndpoints:
+  - http://www.google.com 
+  - https://www.google.com
+  trustedCA:
+    name: user-ca-bundle 
