@@ -1,18 +1,22 @@
-kind: Route
 apiVersion: route.openshift.io/v1
+kind: Route
 metadata:
-  name: example1
+  name: frontend-gnztq
+  ownerReferences:
+  - apiVersion: networking.k8s.io/v1
+    controller: true
+    kind: Ingress
+    name: frontend
+    uid: 4e6c59cc-704d-4f44-b390-617d879033b6
 spec:
-  host: example.local
-  wildcardPolicy: None
+  host: www.example.com
   to:
-    kind: ReplicaSet
-    name: example1
+    kind: Service
+    name: frontend
   tls:
-    termination: edge
-    key: |
-      -----BEGIN PRIVATE KEY-----
-      MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDAFtffJ+8o5asJ
+    certificate: |
+      -----BEGIN CERTIFICATE-----
+          MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDAFtffJ+8o5asJ
       KKkAyH5oOmgAgsDS50oSMsLN4mxr7M3m01fgPliQrKHHStJBv/ijpNIX66/p7Wkl
       ogxgCy4WLwhVfYbmPzvWola+3xwVvcPU4qCLx+V1K2c7iiL11T5Dm12qfyONxwtm
       vxSrZJ5RPDbjH9dOKX2V4A2XNWXFRZB+yeK6+CsQfU4lQAoNd3SBAdZDsG3Iy3Gt
@@ -37,10 +41,11 @@ spec:
       i1cezUTM2mbiSQHi/Ulr/mEx6fflUwBHEK0qpiFt/qkCgYAzUmmBLWEtT3DUgCWU
       B71qTkEM8x/ZmdRxnj1I8SO0qOwmoB0iYRUXry9RXICtg2O7/xVL7zR1slhwIzOK
       aYXJlQRbwjhiMjrlboQt58mlnTlLbt2UBPqWMARup+6dhsemllG5OVvuPckkhuLf
-      I6NMIh4zG7tkwxnb5Coy3kwUMA==
-      -----END PRIVATE KEY-----
-    certificate: |
-      -----BEGIN CERTIFICATE-----
+      I6NMIh4zG7tkwxnb5Coy3kwUMA==  
+      -----END CERTIFICATE-----
+    insecureEdgeTerminationPolicy: Redirect
+    key: |
+      -----BEGIN RSA PRIVATE KEY-----
       MIID/TCCAuWgAwIBAgIUEmKC/Dz2ECjKe7/nUL0Z3LDBji0wDQYJKoZIhvcNAQEL
       BQAwgY0xCzAJBgNVBAYTAkJZMQ4wDAYDVQQIDAVNaW5zazEOMAwGA1UEBwwFTWlu
       c2sxDTALBgNVBAoMBEl0cmExITAfBgNVBAsMGE1pbmlzdHJ5IG9mIFdhdGVyIFNs
@@ -63,38 +68,5 @@ spec:
       8hHCGaO1t/2hroibpPKEbsJp8JIuETUdkUaGAxe9mnJKeMwuVUyQE2GZkxjTn4J3
       r6IJEtOiUIKDAZDpv2NQmCVsV/LUDtAZyNHeBx9pD7MOky6SO9oRo01k2rIXORpE
       NWTt8KKWAZA9Ee35/XZnLBM=
-      -----END CERTIFICATE-----
-
-
----
-kind: Service
-apiVersion: v1
-metadata:
-  name: example1
-spec:
-  selector:
-    k8s-app: example
-  ports:
-  - port: 80
-    targetPort: 8080
----
-apiVersion: apps/v1
-kind: ReplicaSet
-metadata:
-  name: example1
-  labels:
-    k8s-app: example
-spec:
-  selector:
-    matchLabels:
-      k8s-app: example
-  template:
-    metadata:
-      labels:
-        k8s-app: example
-    spec:
-      containers:
-      - image: openshift/deployment-example:v1
-        name: web
-        ports:
-        - containerPort: 8080
+      -----END RSA PRIVATE KEY-----
+    termination: reencrypt

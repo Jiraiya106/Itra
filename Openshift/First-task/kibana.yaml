@@ -24,7 +24,7 @@ spec:
   host: example.local
   wildcardPolicy: None
   to:
-    name: example
+    name: example1
 ---
 kind: Service
 apiVersion: v1
