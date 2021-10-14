@@ -1,0 +1,55 @@
+{
+    "AWSEBDockerrunVersion": 2,
+    "authentication": {
+        "bucket": "<bucket_name>",
+        "key": "<bucker-filename>"
+    },
+    "volumes": [
+        {
+            "name": "nginx-proxy-conf",
+            "host": {
+                "sourcePath": "/var/app/current/nginx/user_conf.d"
+            }
+        }
+    ],
+    "containerDefinitions": [
+        {
+            "name": "nginx",
+            "image": "jonasal/nginx-certbot:latest",
+            "hostname": "nginx",
+            "essential": true,
+            "links": [
+                "app"
+            ],
+            "portMappings": [
+                {
+                    "containerPort": 80,
+                    "hostPort": 80
+                },
+                {
+                    "containerPort": 443,
+                    "hostPort": 443
+                }
+            ],
+            "mountPoints": [
+                {
+                    "sourceVolume": "nginx-proxy-conf",
+                    "containerPath": "/etc/nginx/user_conf.d",
+                    "readOnly": true
+                }
+            ]
+        },
+        {
+            "name": "app",
+            "image": "efraimrodrigues/app-ebs-docker",
+            "hostname": "app",
+            "essential": false,
+            "portMappings": [
+                {
+                    "containerPort": 3000,
+                    "hostPort": 3000
+                }
+            ]
+        }
+    ]
+}
