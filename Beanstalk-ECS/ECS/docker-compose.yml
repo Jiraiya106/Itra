@@ -1,0 +1,30 @@
+version: '3'
+
+services:
+    nginx:
+        image: 225050420367.dkr.ecr.us-west-2.amazonaws.com/task
+        container_name: nginx
+        networks:
+            - thenet
+        ports:
+            - '80:80'
+        logging:
+            driver: awslogs
+            options: 
+                awslogs-group: simple-stack-nginx
+                awslogs-region: us-west-2
+                awslogs-stream-prefix: nginx
+    app:
+        image: 225050420367.dkr.ecr.us-west-2.amazonaws.com/task
+        container_name: appnew
+        networks:
+            - thenet
+        logging:
+            driver: awslogs
+            options: 
+                awslogs-group: simple-stack-app
+                awslogs-region: us-west-2
+                awslogs-stream-prefix: app
+
+networks:
+    thenet:
