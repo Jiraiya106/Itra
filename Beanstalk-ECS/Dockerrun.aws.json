@@ -2,10 +2,24 @@
     "AWSEBDockerrunVersion": 2,
     "containerDefinitions": [
       {
-        "name": "appnew",
-        "image": "somethingsomething.eu-central-1.amazonaws.com/task",
+        "name": "appbean",
+        "image": "225050420367.dkr.ecr.us-west-2.amazonaws.com/task:appbean",
         "essential": true,
         "memory": 128
+      },
+      {
+        "name": "nginxbean",
+        "image": "225050420367.dkr.ecr.us-west-2.amazonaws.com/task:nginxbean",
+        "hostname": "nginx",
+        "essential": true,
+        "portMappings": [
+          {
+            "hostPort": 80,
+            "containerPort": 80
+          }
+        ],
+        "links": ["appbean"],
+        "memoryReservation": 128
       }
     ]
-  }
+}
