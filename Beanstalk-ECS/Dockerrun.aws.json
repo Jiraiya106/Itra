@@ -5,7 +5,7 @@
         "name": "appbean",
         "image": "225050420367.dkr.ecr.us-west-2.amazonaws.com/task:appbean",
         "essential": true,
-        "memory": 128
+        "memoryReservation": 756
       },
       {
         "name": "nginxbean",
