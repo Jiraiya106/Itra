@@ -3,7 +3,7 @@ version: '3'
 services:
     nginx:
         image: 225050420367.dkr.ecr.us-west-2.amazonaws.com/task
-        container_name: nginxbean
+        container_name: nginxpy
         networks:
             - thenet
         ports:
@@ -16,7 +16,7 @@ services:
                 awslogs-stream-prefix: nginx
     app:
         image: 225050420367.dkr.ecr.us-west-2.amazonaws.com/task
-        container_name: appbean
+        container_name: apppy
         networks:
             - thenet
         logging:

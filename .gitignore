@@ -11,3 +11,4 @@ Terraform/First_task/terraform.tfvars
 Terraform/First_task/modules/elasticache
 Terraform/First_task/modules/elasticache1
 Terraform/First_task/files/functions.php
+Beanstalk-ECS/Beanstalk/django

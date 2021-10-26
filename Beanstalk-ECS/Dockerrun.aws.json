@@ -2,14 +2,21 @@
     "AWSEBDockerrunVersion": 2,
     "containerDefinitions": [
       {
-        "name": "appbean",
-        "image": "225050420367.dkr.ecr.us-west-2.amazonaws.com/task:appbean",
+        "name": "app",
+        "image": "225050420367.dkr.ecr.us-west-2.amazonaws.com/task:apppy",
+        "hostname": "app",
         "essential": true,
-        "memoryReservation": 756
+        "portMappings": [
+            {
+              "hostPort": 8000,
+              "containerPort": 8000
+            }
+          ],
+        "memoryReservation": 600
       },
       {
         "name": "nginxbean",
-        "image": "225050420367.dkr.ecr.us-west-2.amazonaws.com/task:nginxbean",
+        "image": "225050420367.dkr.ecr.us-west-2.amazonaws.com/task:nginxpy",
         "hostname": "nginx",
         "essential": true,
         "portMappings": [
@@ -18,7 +25,7 @@
             "containerPort": 80
           }
         ],
-        "links": ["appbean"],
+        "links": ["app"],
         "memoryReservation": 128
       }
     ]
