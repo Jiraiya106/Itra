@@ -2,73 +2,112 @@
 
 SOURCE_DIR=$(realpath "$1")
 DESTINATION_DIR=$(realpath "$2")
+DATE_FORMAT=$(date +%Y%m%d_%H%S)
 
-echo $SOURCE_DIR $DESTINATION_DIR
-
-if [ "$SOURCE_DIR" == "$DESTINATION_DIR" ]
-then
-    echo "ERROR 1"
-    #exit 0
-fi
-
-#Свободное место на диске
-freedisk () {
-    FREEDISK=$(df "$1" | tail -1 | awk '{print$4}')
+compare_dir_paths () {
+  if [ "$1" == "$2" ]
+  then
+    echo "The same names"
+    exit 0
+  fi
 }
 
-parentdir () {
-    PARENT_DIR=$(dirname $1)
+#Free disk
+get_free_disk_space () {
+  df "$1" | tail -1 | awk '{print$4}'
 }
 
-parentdir $SOURCE_DIR
-PARENT_SOURCE=$PARENT_DIR
-parentdir $DESTINATION_DIR
-PARENT_DEST=$PARENT_DIR
+is_directory_parentine () {
+  PARENT_SOURCE=$(dirname "$1")
+  PARENT_DESTINATION=$(dirname "$2")
 
-echo $PARENT_SOURCE $PARENT_DEST
-
-# if [ "$SOURCE_DIR" == "$PARENT_DEST" ]
-# then
-#     echo "ERROR 2"
-#     #exit 0
-# elif [ "$DESTINATION_DIR" == "$PARENT_SOURCE" ]
-# then 
-#     echo "ERROR 3"
-# fi
-
- #Объем папки
-DIRSPACE=$(du -s "$SOURCE_DIR" | awk '{print$1}')
-
-freedisk $DESTINATION_DIR
-
-#Скопировать папки
-copyall () {
-    cp -p -r $1 $2
+  if [ "$1" == "$PARENT_DESTINATION" ]
+  then
+    echo ""$2" parent directory "$1""
+    exit 0
+  elif [ "$2" == "$PARENT_SOURCE" ]
+  then 
+    echo ""$1" parent directory "$2""
+    exit 0
+  fi
 }
 
-copyfile () {
-if [ "$DIRSPACE" -lt "$FREEDISK" ]
-then
-    copyall $SOURCE_DIR $PARENT_DEST 
-else 
-    echo "Not enough free space no disk. Continue?(Y/N)"
-    read
-    case "$1" in
-    "Y" | "y") 
-        copyall $SOURCE_DIR $PARENT_DEST;;
-    "N" | "n") 
-        exit 0;;
-    *)
-        copyfile
-    esac
-fi
+#Volume directory
+get_dir_space () {
+  du -s "$1" | awk '{print$1}'
 }
 
-copyfile
-echo $DIRSPACE $FREEDISK
+archive_and_cleanup () {
+  case $choice_d_or_r in 
+    D | d)
+      tar  -czpf $DESTINATION_DIR/$DATE_FORMAT.tar.gz  -C $PARENT_SOURCE $(basename $SOURCE_DIR) 1>& out_$DATE_FORMAT.log
+      ;;
+    R | r)
+      arr=(${DESTINATION_DIR}/[0-9].tar.gz)
+      for ((a=${#arr[*]}; a >= $copies; a--)) do
+        rm $DESTINATION_DIR/$a.tar.gz 1>& out_$DATE_FORMAT.log
+      done
+      for ((a=${#arr[*]}; a > "0"; a--)) do
+        $(mv ${arr[$a-1]} $DESTINATION_DIR/$a.tar.gz 1>& out_$DATE_FORMAT.log)
+        rm $DESTINATION_DIR/$copies.tar.gz 1>& out_$DATE_FORMAT.log
+      done
+      $(tar -czpf $DESTINATION_DIR/0.tar.gz -P -C $PARENT_SOURCE $(basename $SOURCE_DIR) 1>& out_$DATE_FORMAT.log)
+      ;;
+    *) echo "Try again";;
+  esac
+}
+
+file_archiving () {
+  DEST_FREE_DISK=$(get_free_disk_space $2)
+  SOURCE_DIR_SIZE=$(get_dir_space $1)
+
+  if [ "$SOURCE_DIR_SIZE" -lt "$DEST_FREE_DISK" ] 
+  then
+    archive_and_cleanup
+    NUMBER_ERROR=$(archive_and_cleanup 2>&1 | tee >(wc -l) > /dev/null) && cat out_$DATE_FORMAT.log
+  else
+    while true; do
+      read -p "Not enough no free space disk. Continue?(Y/N)" choice_y_or_n
+      case "$choice_y_or_n" in
+        Y | y) 
+          NUMBER_ERROR=$(archive_and_cleanup 2>&1 | tee >(wc -l) > /dev/null) && cat out_$DATE_FORMAT.log
+          break 2;;
+        N | n) 
+          exit 0;;
+        *)
+          echo "Enter Y or N"
+      esac
+    done
+  fi
+}
+
+main () {
+  compare_dir_paths "$SOURCE_DIR" "$DESTINATION_DIR"
+  is_directory_parentine "$SOURCE_DIR" "$DESTINATION_DIR"
+  
+  while true;do
+    echo "We use the date(D) or rotation(R)?"
+    read -p "" choice_d_or_r
+      case $choice_d_or_r in 
+        D | d) 
+          choice_d_or_r=D
+          break 2;;
+        R | r) 
+          choice_d_or_r=R
+          echo "Maximum number of copies "
+          read -p "" copies 
+          break 2;;
+        *) echo "Try again";;
+      esac
+  done
+  
+  file_archiving "$SOURCE_DIR" "$DESTINATION_DIR"
+  find out_*.log -type f -empty -exec rm {} \;
+  if [ $NUMBER_ERROR -ne 0 ] 
+  then
+    echo -e "\033[31mWarning: $NUMBER_ERROR error(s) occurred!"
+  fi
+}
 
 
-
-
-
-MOUNTDISK=$(df /home/ITRANSITION.CORP/e.ilin/Work/Itra/ | tail -1 | awk '{print$1}') #Куда смонтирована
+main
