@@ -16,13 +16,12 @@ def backupToZip(folder):
     for foldername, subfolders, filenames in os.walk(folder):
         print('Add file of dir %s...' % (foldername))
         backupZip.write(foldername)
-        newBase = '1'
         for filename in filenames:
             os.path.basename(folder) + '_'
-            if filename.startswith(newBase) and filename.endwith('.zip'):
+            if filename.startswith('Python') and filename.endswith('.zip'):
                 continue
             backupZip.write(os.path.join(foldername, filename))
-            backupZip.close()
-        print('Ready')
+    backupZip.close()
+    print('Ready')
             
 backupToZip('/home/ITRANSITION.CORP/e.ilin/Work/Itra/Python')
