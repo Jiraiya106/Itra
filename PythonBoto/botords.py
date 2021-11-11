@@ -9,11 +9,13 @@ def main():
     rds = boto3.client('rds')
     response = rds.describe_db_instances()
     rds_instances = list( filter( lambda x: x["DBSubnetGroup"]["VpcId"] == VPC_ID, response["DBInstances"] ) )
-    print(rds_instances)
+    #print(rds_instances)
     if len(rds_instances) > 0:
         print("\nRDS Instances")
         for rds in rds_instances:
             print(rds["DBInstanceIdentifier"])
+            for k in rds['VpcSecurityGroups']:
+                print(k['VpcSecurityGroupId'])
     else:
         print("There is no RDS instance in this VPC!")
 
