@@ -6,7 +6,7 @@ from ipaddress import IPv4Network, IPv4Address
 
 
 client = boto3.client('ec2')
-vpc_id = 'vpc-0824773dc9094b10b'
+vpc_id = 'vpc-dc6768a4'
 
 #SG
 def all_sg_CIDR(security):
@@ -36,6 +36,7 @@ def list_egreess(security):
         for j in i['IpPermissionsEgress']:
             for k in j['IpRanges']:
                 m.append(k['CidrIp'])
+    return m
 
 def list_ingress(security):
     response = client.describe_security_groups(GroupIds=[security])
@@ -111,12 +112,12 @@ def list_rds_name(rds_instances):
 def main():
     for i in range(len(id_ec2)):
         print( 'EC2 Instances: ' +  id_ec2[i])
-        list_egreess( ec2_sg[i])
+        print(list_egreess( ec2_sg[i]))
         print( 'Private address EC2: ' + ec2_address[i] + '\n')
     for i in range(len(rds)):
         print( 'RDS Instance: ' + rds[i] )
         list_ingress( rds_sg[i] )
-        #print( list_ingress_cidr( rds_sg[i] ) )
+        print( list_ingress_cidr( rds_sg[i] ) )
         list_true_false( list_ingress_cidr( rds_sg[i] ), ec2_address, id_ec2 ) 
         print( " " )
 
@@ -130,6 +131,7 @@ id_ec2 = list_ec2_id(ec2_instances)
 ec2_sg = list_ec2_sec_group_ids(ec2_instances)
 ec2_address = list_private_address_ec2(ec2_instances)
 
-#print( list_ingress_cidr( 'sg-0cd275ab14229c79d' ) )
+print( client.describe_instances(Filters = [{'Name': 'vpc-id', 'Values': [vpc_id]}]) )
+#list_egreess(  )
 #all_sg_CIDR( 'sg-0cd275ab14229c79d' )
-main()
+#main()
