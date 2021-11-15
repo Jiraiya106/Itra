@@ -3,7 +3,7 @@
 import boto3
 
 #from PythonBoto.botoec2example import VPC_ID
-VPC_ID = 'vpc-dc6768a4'
+VPC_ID = 'vpc-0824773dc9094b10b'
 
 def main():
     rds = boto3.client('rds')
