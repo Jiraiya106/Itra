@@ -14,3 +14,4 @@ def list_rds_sec_group_ids(rds_instances):
 
 rds_instances = list_all_rds_instances()
 print(list_rds_sec_group_ids(rds_instances))
+
