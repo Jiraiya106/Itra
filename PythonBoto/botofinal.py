@@ -9,26 +9,6 @@ client = boto3.client('ec2')
 vpc_id = 'vpc-0824773dc9094b10b'
 
 #SG
-def all_sg_CIDR(security):
-    try:
-        response = client.describe_security_groups(GroupIds=[security])
-            
-        for i in response['SecurityGroups']:
-            for j in i['IpPermissionsEgress']:
-                for k in j['IpRanges']:
-                    print("IP Ranges Egress: "+k['CidrIp'])
-            for j in i['IpPermissions']:
-                try:
-                    print("PORT: "+str(j['FromPort']))
-                    for k in j['IpRanges']:
-                        print("IP Ranges Ingress: "+k['CidrIp'])
-                            
-                except Exception:
-                    print("No value for ports and ip ranges available for this security group")
-                    continue
-    except ClientError as e:
-        print(e)
-
 def list_egreess(security):
     response = client.describe_security_groups(GroupIds=[security])
     for i in response['SecurityGroups']:
@@ -40,8 +20,15 @@ def list_egreess(security):
 def list_egreess_port(security):
     response = client.describe_security_groups(GroupIds=[security])
     for i in response['SecurityGroups']:
+        m = 0
         for j in i['IpPermissionsEgress']:
-            m = j['ToPort']
+            
+            try:
+                k = j['FromPort']
+                if k >= m:
+                   m = k
+            except ClientError as e:
+                m = 'False'
     return m
 
 def list_ingress(security):
@@ -82,24 +69,20 @@ def list_true_false_address(a, b):
     return m
 
 def egress_check( a, b):
-    for i in range(len(a)):
-        print(list_egreess(a[i]))
-        if list_egreess(a[i]) == '0.0.0.0/0':
-            print('True')
-            continue
+        if list_egreess(a) == '0.0.0.0/0' and str(list_egreess_port(a)) == '0':
+                res = True
         else:
-            for k in range(len(b)):
-                print( 'RDS port: ' + str(list_ingress_port( b[k] )))
-                print( 'Instance port: ' + str(list_egreess_port( a[i] )))
-                if list_ingress_port( b[k] )==list_egreess_port( a[i] ):
-                    print(' True - 2 ')
-                    if IPv4Network(list_egreess(a[i])).compare_networks(IPv4Network('10.0.240.0/24')) >= 0:
-                        print(' True - 3 ')
-                        continue
+                if list_ingress_port( b )==list_egreess_port( a ):
+                    res = True
+                    if IPv4Network(list_egreess(a)).compare_networks(IPv4Network(list_ingress_cidr(b))) >= 0:
+                        res = True
                     else:
+                        res = False
                         print( 'Address error' )
                 else:
+                    res = False
                     print( 'Port error' )
+        return res
 
 def check_egress_group(a):
     response = client.describe_security_groups(GroupIds=[a])
@@ -147,14 +130,14 @@ def list_rds_name(rds_instances):
 def main():
     for i in range(len(id_ec2)):
         print( 'EC2 Instances: ' +  id_ec2[i])
-        print(list_egreess( ec2_sg[i]))
         print( 'Private address EC2: ' + ec2_address[i] + '\n')
         for k in range(len(rds)):
             print( 'RDS Instance: ' + rds[k] )
-            list_ingress( rds_sg[k] )
             print( list_ingress_cidr( rds_sg[k] ) )
-            print('Instance ' + id_ec2[i] + ' ' + 'in ingress ' + rds_sg[k] + ': ' + str( list_true_false_address( list_ingress_cidr( rds_sg[k] ), ec2_address[i]) ))
-            #list_true_false_address( list_ingress_cidr( rds_sg[i] ), ec2_address, id_ec2 ) 
+            if egress_check( ec2_sg[i], rds_sg[k]) == True:
+                print('Instance ' + id_ec2[i] + ' ' + 'in ingress ' + rds_sg[k] + ': ' + str( list_true_false_address( list_ingress_cidr( rds_sg[k] ), ec2_address[i]) ))
+            else:
+                print('Instance ' + id_ec2[i] + ' ' + 'in ingress ' + rds_sg[k] + ': False-2')
             print( " " )
 
 rds_instances = list_all_rds_instances(vpc_id)
@@ -167,10 +150,4 @@ id_ec2 = list_ec2_id(ec2_instances)
 ec2_sg = list_ec2_sec_group_ids(ec2_instances)
 ec2_address = list_private_address_ec2(ec2_instances)
 
-#print( client.describe_instances(Filters = [{'Name': 'vpc-id', 'Values': [vpc_id]}]) )
-#list_egreess(  )
-#print(ec2_address)
-#all_sg_CIDR( 'sg-0cd275ab14229c79d' )
 main()
-
-#egress_check( ec2_sg, rds_sg )
