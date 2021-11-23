@@ -5,6 +5,7 @@ from botocore.exceptions import ClientError
 from ipaddress import IPv4Interface, IPv4Network, IPv4Address
 
 
+
 client = boto3.client('ec2')
 vpc_id = 'vpc-0824773dc9094b10b'
 
@@ -101,6 +102,24 @@ def check_egress_group(a):
 
     return m
 
+def eggress_check_group(ec2_sg, rds_sg, ec2_address, id_ec2):
+    if egress_check( ec2_sg, rds_sg) == True:
+        print('Instance ' + id_ec2 + ' ' + 'in ingress ' + rds_sg + ': ' + str( list_true_false_address( list_ingress_cidr( rds_sg ), ec2_address) ))
+        m = str( list_true_false_address( list_ingress_cidr( rds_sg ), ec2_address) )
+    else:
+        # print('Instance ' + id_ec2 + ' ' + 'in ingress ' + rds_sg + ': False-2')
+        m = 'False-2'
+    return m
+
+def check_ingreess_group(a):
+    response = client.describe_security_groups(GroupIds=[a])
+    for i in response['SecurityGroups']:
+        l = []
+        for j in i['IpPermissions']:
+            for k in j['UserIdGroupPairs']:
+                l.append( k['GroupId'] )
+    return l
+
 #EC2
 def list_all_ec2_instances(client, vpc_id):
     response = client.describe_instances(Filters = [{'Name': 'vpc-id', 'Values': [vpc_id]}])
@@ -133,15 +152,20 @@ def list_rds_name(rds_instances):
 def check_rds_accessed(list_rds, rds_sg, ec2_sg, ec2_address, id_ec2 ):
     for i in range(len(list_rds)):
         print( 'RDS Instance: ' + list_rds[i] )
-        #print( list_ingress_cidr( rds_sg[i] ) )
-        #print( 'EC2 SG: ' + ec2_sg )
-        if egress_check( ec2_sg, rds_sg[i]) == True:
-            print('Instance ' + id_ec2 + ' ' + 'in ingress ' + rds_sg[i] + ': ' + str( list_true_false_address( list_ingress_cidr( rds_sg[i] ), ec2_address) ))
-            m = str( list_true_false_address( list_ingress_cidr( rds_sg[i] ), ec2_address) )
+        if len( check_ingreess_group(rds_sg[i]) ) > 0:
+            eggress_check_group(ec2_sg, rds_sg[i], ec2_address, id_ec2)
+            for k in range( len( check_ingreess_group(rds_sg[i]) ) ):
+                eggress_check_group(ec2_sg, check_ingreess_group(rds_sg[i])[k], ec2_address, id_ec2)
         else:
-            print('Instance ' + id_ec2 + ' ' + 'in ingress ' + rds_sg[i] + ': False-2')
-            m = 'False-2'
-    return m
+            eggress_check_group(ec2_sg, rds_sg[i], ec2_address, id_ec2)
+        # if egress_check( ec2_sg, rds_sg[i]) == True:
+        #     print('Instance ' + id_ec2 + ' ' + 'in ingress ' + rds_sg[i] + ': ' + str( list_true_false_address( list_ingress_cidr( rds_sg[i] ), ec2_address) ))
+        #     m = str( list_true_false_address( list_ingress_cidr( rds_sg[i] ), ec2_address) )
+        # else:
+        #     print('Instance ' + id_ec2 + ' ' + 'in ingress ' + rds_sg[i] + ': False-2')
+        #m = 'End check_rds...'
+    #return m
+
 #Main
 def main():
     for i in range(len(id_ec2)):
@@ -149,20 +173,14 @@ def main():
         print( 'Private address EC2: ' + ec2_address[i] + '\n')
 
         if len(check_egress_group( ec2_sg[i] )) > 0:
-            print( check_rds_accessed( rds, rds_sg, ec2_sg[i], ec2_address[i],  id_ec2[i]) )
+            check_rds_accessed( rds, rds_sg, ec2_sg[i], ec2_address[i],  id_ec2[i]) 
             for k in range( len(check_egress_group( ec2_sg[i] )) ):
-                print(k)
-                #print( check_egress_group( ec2_sg[i] )[k] )
-                print( check_rds_accessed( rds, rds_sg, check_egress_group( ec2_sg[i] )[k], ec2_address[i],  id_ec2[i]) )
+                print(' ')
+                check_rds_accessed( rds, rds_sg, check_egress_group( ec2_sg[i] )[k], ec2_address[i],  id_ec2[i])
         else:
-            print( check_rds_accessed( rds, rds_sg, ec2_sg[i], ec2_address[i],  id_ec2[i]) )
-        # for k in range(len(rds)):
-        #     print( 'RDS Instance: ' + rds[k] )
-        #     print( list_ingress_cidr( rds_sg[k] ) )
-        #     if egress_check( ec2_sg[i], rds_sg[k]) == True:
-        #         print('Instance ' + id_ec2[i] + ' ' + 'in ingress ' + rds_sg[k] + ': ' + str( list_true_false_address( list_ingress_cidr( rds_sg[k] ), ec2_address[i]) ))
-        #     else:
-        #         print('Instance ' + id_ec2[i] + ' ' + 'in ingress ' + rds_sg[k] + ': False-2')
+            check_rds_accessed( rds, rds_sg, ec2_sg[i], ec2_address[i],  id_ec2[i])
+            #print(rds_sg)
+            #print('Instance ' + id_ec2[i] + ' ' + 'in ingress ' + rds_sg + ': False-2')
         print( " " )
 
 rds_instances = list_all_rds_instances(vpc_id)
