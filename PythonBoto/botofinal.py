@@ -107,7 +107,6 @@ def eggress_check_group(ec2_sg, rds_sg, ec2_address, id_ec2):
         print('Instance ' + id_ec2 + ' ' + 'in ingress ' + rds_sg + ': ' + str( list_true_false_address( list_ingress_cidr( rds_sg ), ec2_address) ))
         m = str( list_true_false_address( list_ingress_cidr( rds_sg ), ec2_address) )
     else:
-        # print('Instance ' + id_ec2 + ' ' + 'in ingress ' + rds_sg + ': False-2')
         m = 'False-2'
     return m
 
@@ -158,13 +157,6 @@ def check_rds_accessed(list_rds, rds_sg, ec2_sg, ec2_address, id_ec2 ):
                 eggress_check_group(ec2_sg, check_ingreess_group(rds_sg[i])[k], ec2_address, id_ec2)
         else:
             eggress_check_group(ec2_sg, rds_sg[i], ec2_address, id_ec2)
-        # if egress_check( ec2_sg, rds_sg[i]) == True:
-        #     print('Instance ' + id_ec2 + ' ' + 'in ingress ' + rds_sg[i] + ': ' + str( list_true_false_address( list_ingress_cidr( rds_sg[i] ), ec2_address) ))
-        #     m = str( list_true_false_address( list_ingress_cidr( rds_sg[i] ), ec2_address) )
-        # else:
-        #     print('Instance ' + id_ec2 + ' ' + 'in ingress ' + rds_sg[i] + ': False-2')
-        #m = 'End check_rds...'
-    #return m
 
 #Main
 def main():
@@ -179,8 +171,6 @@ def main():
                 check_rds_accessed( rds, rds_sg, check_egress_group( ec2_sg[i] )[k], ec2_address[i],  id_ec2[i])
         else:
             check_rds_accessed( rds, rds_sg, ec2_sg[i], ec2_address[i],  id_ec2[i])
-            #print(rds_sg)
-            #print('Instance ' + id_ec2[i] + ' ' + 'in ingress ' + rds_sg + ': False-2')
         print( " " )
 
 rds_instances = list_all_rds_instances(vpc_id)
