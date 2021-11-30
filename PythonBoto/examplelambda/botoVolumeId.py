@@ -18,7 +18,19 @@ def tagRetention(a):
     volume = ec2.Volume(a)
     for i in volume.tags:
         if i['Key'] == 'BackupRetention':
-            print( i['Value'] )
+            res = i['Value']
+    return res
 
-tagRetention('vol-0016e7ea6327b2338')
+def saveOldTags(a):
+    res = []
+    volume = ec2.Volume(a)
+    for i in volume.tags:
+        if i['Key'] == 'Backup':
+            continue
+        else:
+            res.append(i)
+    return res 
+
+print(saveOldTags( 'vol-0016e7ea6327b2338' ))
+#print(tagRetention('vol-0016e7ea6327b2338'))
 #print(volume_id())
