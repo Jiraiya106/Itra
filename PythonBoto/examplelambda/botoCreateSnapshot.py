@@ -14,8 +14,7 @@ def saveOldTags(a):
     return res
 
 ec2 = boto3.resource('ec2')
-volume = ec2.Volume( 'vol-0016e7ea6327b2338' ) 
-# snapshot1 = ec2.Snapshot('vol-0016e7ea6327b2338')
+#volume = ec2.Volume( 'vol-0016e7ea6327b2338' ) 
 
 def tagRetention(a):
     volume = ec2.Volume(a)
@@ -24,35 +23,34 @@ def tagRetention(a):
             res = i['Value']
     return res
 
-
-snapshot = volume.create_snapshot(
-    Description='Example',
-    #OutpostArn='string',
-    TagSpecifications=[
-        {
-            'ResourceType': 'snapshot',
-            'Tags': [
-                {
-                    'Key': 'Name',
-                    'Value': 'Example'
-                },
-                {
-                    'Key': 'BackupDescription',
-                    'Value': 'string'
-                },
-                {
-                    'Key': 'BackupRetention',
-                    'Value': tagRetention(volume.id)
-                },
-                {
-                    'Key': 'BackupCreated',
-                    'Value': str(now.strftime("%d-%m-%Y"))
-                },
-                saveOldTags(volume.id)[0]                                
-            ]
-        },
-    ],
-    #DryRun=True|False
-)
+def createSnaphot(volume_id):
+    volume = ec2.Volume( volume_id )
+    snapshot = volume.create_snapshot(
+        Description='Example',
+        TagSpecifications=[
+            {
+                'ResourceType': 'snapshot',
+                'Tags': [
+                    {
+                        'Key': 'Name',
+                        'Value': 'Example'
+                    },
+                    {
+                        'Key': 'BackupDescription',
+                        'Value': 'string'
+                    },
+                    {
+                        'Key': 'BackupRetention',
+                        'Value': tagRetention(volume.id)
+                    },
+                    {
+                        'Key': 'BackupCreated',
+                        'Value': str(now.strftime("%d-%m-%Y"))
+                    },
+                    saveOldTags(volume.id)[0]                                
+                ]
+            },
+        ],
+    )
 
 
