@@ -15,21 +15,21 @@ snapshots = EC2_RESOURCE.snapshots.filter(
 
 def tagRetentionSnapshot(snapshot_id):
     for snapshot in snapshots:
-        print(snapshot.id)
         if snapshot.id == snapshot_id:
             try:
                 for tags in snapshot.tags:
                     if tags['Key'] == 'BackupRetention':
-                        print(tags['Value'])
+                        res = tags['Value']
             except:
                 print('False')
+    return res
 
 def listSnapshotOnDelete():
     for snapshot in snapshots:
         try:
             for tags in snapshot.tags:
                 if tags['Key'] == 'BackupCreated':
-                    if datetime.datetime.strptime(tags['Value'],"%d-%m-%Y" ) + datetime.timedelta(days=2) <= datetime.datetime.now():
+                    if datetime.datetime.strptime(tags['Value'],"%d-%m-%Y" ) + datetime.timedelta(days=tagRetentionSnapshot( snapshot.id )) <= datetime.datetime.now():
                         EC2_RESOURCE.Snapshot( snapshot.id ).delete()
                         print('True')
                     else: 

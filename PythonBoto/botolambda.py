@@ -8,8 +8,9 @@ EC2_CLIENT = boto3.client('ec2')
 STS_CLIENT = boto3.client('sts')
 CURRENT_ACCOUNT_ID = STS_CLIENT.get_caller_identity()['Account']
 NOW = datetime.datetime.now()
-DEFAULTRETENTION = 3
-DRYRUN = 'DryRun'
+DEFAULTRETENTION = '3'
+#DRYRUN = True
+DRYRUN = False
 
 SNAPSHOTS = EC2_RESOURCE.snapshots.filter(
     OwnerIds=[
@@ -40,12 +41,13 @@ def saveOldTags(volume_id):
 
 def intSaveOldTags(volume_id):
     if len(saveOldTags(volume_id)) != 0:
-        saveOldTags(volume_id)
+       res = saveOldTags(volume_id)
     else:
-        res = {
-            'Key': 'No',
-            'Value': 'Value'
-        }
+        res = [{
+            'Key': 'HZ-WHAT',
+            'Value': 'HZ-WHAT'
+        }]
+    print( res )
     return res
 
 def tagRetention(volume_id):
@@ -59,9 +61,7 @@ def tagRetention(volume_id):
                 res = DEFAULTRETENTION
                 break
         else:
-            print( 'Volume ' + volume_id + ' has Tag: ' + i['Key'] )
             res = DEFAULTRETENTION
-    print( res )
     return res
 
 def createSnapshot(volume_id):
@@ -74,7 +74,7 @@ def createSnapshot(volume_id):
                 'Tags': [
                     {
                         'Key': 'Name',
-                        'Value': 'Example'
+                        'Value': 'NewName'
                     },
                     {
                         'Key': 'BackupDescription',
@@ -88,7 +88,7 @@ def createSnapshot(volume_id):
                         'Key': 'BackupCreated',
                         'Value': '20-11-2021'#str(NOW.strftime("%d-%m-%Y"))
                     },
-                    #saveOldTags(volume_id)
+                    intSaveOldTags(volume_id)[0]
                 ]
             },
         ],
@@ -99,6 +99,7 @@ def createSnapshots():
     for volume in volume_list:
         print( volume )
         createSnapshot( volume )
+        print( intSaveOldTags(volume) )
     print( '\n It is all' )
 
 #Delete Snapshot
@@ -119,7 +120,7 @@ def deleteSnapshot():
             for tags in snapshot.tags:
                 if tags['Key'] == 'BackupCreated':
                     if datetime.datetime.strptime(tags['Value'],"%d-%m-%Y" ) + datetime.timedelta(days=int(tagRetentionSnapshot( snapshot.id ))) <= datetime.datetime.now():
-                        if DRYRUN == 'DryRun':
+                        if DRYRUN == False:
                             EC2_RESOURCE.Snapshot( snapshot.id ).delete()
                         print('Snapshot deleted: ' + snapshot.id)
                     else: 
@@ -148,9 +149,14 @@ def dryRun():
     deleteSnapshot()
     #deleteDryRun()
 
-dryRun()
-
 def main():
-    print(' ')
-    deleteSnapshot()
-    createSnapshots()
+    if DRYRUN == True:
+        dryRun()
+    else:
+        print(' ')
+        deleteSnapshot()
+        createSnapshots()
+
+main()
+
+#saveOldTags(  )
