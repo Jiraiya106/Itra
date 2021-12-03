@@ -33,21 +33,10 @@ def saveOldTags(volume_id):
     res = []
     volume = EC2_RESOURCE.Volume( volume_id )
     for i in volume.tags:
-        if i['Key'] == 'Backup':
+        if i['Key'] == 'Backup' or i['Key'] == 'BackupRetention':
             continue
         else:
             res.append(i)
-    return res
-
-def intSaveOldTags(volume_id):
-    if len(saveOldTags(volume_id)) != 0:
-       res = saveOldTags(volume_id)
-    else:
-        res = [{
-            'Key': 'HZ-WHAT',
-            'Value': 'HZ-WHAT'
-        }]
-    print( res )
     return res
 
 def tagRetention(volume_id):
@@ -66,12 +55,7 @@ def tagRetention(volume_id):
 
 def createSnapshot(volume_id):
     volume = EC2_RESOURCE.Volume( volume_id )
-    volume.create_snapshot(
-        Description='Example',
-        TagSpecifications=[
-            {
-                'ResourceType': 'snapshot',
-                'Tags': [
+    Tags = [
                     {
                         'Key': 'Name',
                         'Value': 'NewName'
@@ -86,39 +70,17 @@ def createSnapshot(volume_id):
                     },
                     {
                         'Key': 'BackupCreated',
-                        'Value': '20-11-2021'#str(NOW.strftime("%d-%m-%Y"))
+                        'Value': str(NOW.strftime("%d-%m-%Y"))
                     },
-                    saveOldTags(volume_id)[0]
                 ]
-            },
-        ],
-    )
-
-def createSnapshotWithoutTags(volume_id):
-    volume = EC2_RESOURCE.Volume( volume_id )
+    for i in saveOldTags( volume_id ):
+        Tags.append(i)
     volume.create_snapshot(
         Description='Example',
         TagSpecifications=[
             {
                 'ResourceType': 'snapshot',
-                'Tags': [
-                    {
-                        'Key': 'Name',
-                        'Value': 'NewName'
-                    },
-                    {
-                        'Key': 'BackupDescription',
-                        'Value': 'string'
-                    },
-                    {
-                        'Key': 'BackupRetention',
-                        'Value': tagRetention(volume_id)
-                    },
-                    {
-                        'Key': 'BackupCreated',
-                        'Value': '20-11-2021'#str(NOW.strftime("%d-%m-%Y"))
-                    },
-                ]
+                'Tags': Tags
             },
         ],
     )
@@ -127,11 +89,7 @@ def createSnapshots():
     volume_list = volumeId()
     for volume in volume_list:
         print( volume )
-        if len(saveOldTags(volume)) != 0:
-            createSnapshot( volume )
-        else:
-            createSnapshotWithoutTags( volume )
-            
+        createSnapshot( volume )
     print( '\n It is all' )
 
 #Delete Snapshot
@@ -151,7 +109,8 @@ def deleteSnapshot():
         try:
             for tags in snapshot.tags:
                 if tags['Key'] == 'BackupCreated':
-                    if datetime.datetime.strptime(tags['Value'],"%d-%m-%Y" ) + datetime.timedelta(days=int(tagRetentionSnapshot( snapshot.id ))) <= datetime.datetime.now():
+                    if  datetime.datetime.strptime(tags['Value'],"%d-%m-%Y" ) +\
+                        datetime.timedelta(days=int(tagRetentionSnapshot( snapshot.id ))) <= datetime.datetime.now():
                         if DRYRUN == False:
                             EC2_RESOURCE.Snapshot( snapshot.id ).delete()
                         print('Snapshot deleted: ' + snapshot.id)
@@ -161,34 +120,17 @@ def deleteSnapshot():
             print( 'Snapshot ' + snapshot.id + ' has not Tags' )
 
 #DryRun
-
-def deleteDryRun():
-    for snapshot in SNAPSHOTS:
-        try:
-            for tags in snapshot.tags:
-                if tags['Key'] == 'BackupCreated':
-                    if datetime.datetime.strptime(tags['Value'],"%d-%m-%Y" ) + datetime.timedelta(days=int(tagRetentionSnapshot( snapshot.id ))) <= datetime.datetime.now():
-                        print('Snapshot deleted: ' + snapshot.id)
-                    else: 
-                        print('Snapshot does not deleted: ' + snapshot.id)
-        except:
-             print( 'Snapshot ' + snapshot.id + ' has no Tags' )
-
 def dryRun():
     volume_list = volumeId()
     for volume in volume_list:
         print('Volume created: ' + volume)
     deleteSnapshot()
-    #deleteDryRun()
 
 def main():
     if DRYRUN == True:
         dryRun()
     else:
-        print(' ')
         deleteSnapshot()
         createSnapshots()
 
 main()
-
-#saveOldTags(  )
