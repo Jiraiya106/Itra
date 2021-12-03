@@ -88,7 +88,36 @@ def createSnapshot(volume_id):
                         'Key': 'BackupCreated',
                         'Value': '20-11-2021'#str(NOW.strftime("%d-%m-%Y"))
                     },
-                    intSaveOldTags(volume_id)[0]
+                    saveOldTags(volume_id)[0]
+                ]
+            },
+        ],
+    )
+
+def createSnapshotWithoutTags(volume_id):
+    volume = EC2_RESOURCE.Volume( volume_id )
+    volume.create_snapshot(
+        Description='Example',
+        TagSpecifications=[
+            {
+                'ResourceType': 'snapshot',
+                'Tags': [
+                    {
+                        'Key': 'Name',
+                        'Value': 'NewName'
+                    },
+                    {
+                        'Key': 'BackupDescription',
+                        'Value': 'string'
+                    },
+                    {
+                        'Key': 'BackupRetention',
+                        'Value': tagRetention(volume_id)
+                    },
+                    {
+                        'Key': 'BackupCreated',
+                        'Value': '20-11-2021'#str(NOW.strftime("%d-%m-%Y"))
+                    },
                 ]
             },
         ],
@@ -98,8 +127,11 @@ def createSnapshots():
     volume_list = volumeId()
     for volume in volume_list:
         print( volume )
-        createSnapshot( volume )
-        print( intSaveOldTags(volume) )
+        if len(saveOldTags(volume)) != 0:
+            createSnapshot( volume )
+        else:
+            createSnapshotWithoutTags( volume )
+            
     print( '\n It is all' )
 
 #Delete Snapshot
