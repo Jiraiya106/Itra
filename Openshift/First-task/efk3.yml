@@ -1,0 +1,58 @@
+apiVersion: elasticsearch.k8s.elastic.co/v1
+kind: Elasticsearch
+metadata:
+  name: instance 
+  namespace: elastic 
+spec:
+  version: 7.15.0
+  nodeSets:
+  - name: default
+    count: 1
+    config:
+      node.store.allow_mmap: false
+  outputs:
+   - name: elasticsearch-secure 
+     type: "elasticsearch"
+     url: https://elasticsearch.secure.com:9200
+     secret:
+        name: elasticsearch
+   - name: elasticsearch-insecure 
+     type: "elasticsearch"
+     url: http://elasticsearch.insecure.com:9200
+   - name: kafka-app 
+     type: "kafka"
+     url: tls://kafka.secure.com:9093/app-topic
+  inputs: 
+   - name: my-app-logs
+     application:
+        namespaces:
+        - my-project
+  pipelines:
+   - name: audit-logs 
+     inputRefs:
+      - audit
+     outputRefs:
+      - elasticsearch-secure
+      - default
+     parse: json 
+     labels:
+       secure: "true" 
+       datacenter: "east"
+   - name: infrastructure-logs 
+     inputRefs:
+      - infrastructure
+     outputRefs:
+      - elasticsearch-insecure
+     labels:
+       datacenter: "west"
+   - name: my-app 
+     inputRefs:
+      - my-app-logs
+     outputRefs:
+      - default
+   - inputRefs: 
+      - application
+     outputRefs:
+      - kafka-app
+     labels:
+       datacenter: "south"

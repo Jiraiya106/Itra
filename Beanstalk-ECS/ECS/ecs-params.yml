@@ -1,0 +1,14 @@
+version: 1
+task_definition:
+  services:
+    web:
+      cpu_shares: 100
+      mem_limit: 1024
+run_params:
+ network_configuration:
+  awsvpc_configuration:
+    subnets:
+      - subnet-0142cecfb4da6e937
+      - subnet-06d14fc9cdf5519d5
+    security_groups:
+        - "sg-0cd275ab14229c79d"

@@ -1,0 +1,100 @@
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: example1
+spec:
+  host: example.local
+  wildcardPolicy: None
+  to:
+    kind: ReplicaSet
+    name: example1
+  tls:
+    termination: edge
+    key: |
+      -----BEGIN PRIVATE KEY-----
+      MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDAFtffJ+8o5asJ
+      KKkAyH5oOmgAgsDS50oSMsLN4mxr7M3m01fgPliQrKHHStJBv/ijpNIX66/p7Wkl
+      ogxgCy4WLwhVfYbmPzvWola+3xwVvcPU4qCLx+V1K2c7iiL11T5Dm12qfyONxwtm
+      vxSrZJ5RPDbjH9dOKX2V4A2XNWXFRZB+yeK6+CsQfU4lQAoNd3SBAdZDsG3Iy3Gt
+      KrOA1fs31keORPRSOhoDhXFNUdYg2ksfTYzcDu1aUvZCm0wXe6qaNZeHuz7zBGsG
+      BNLRKRNZc4y8Rx3rJCtVpAl5O99+c9RUXzHEsMnOqWLQAq0Y6W2FNDV8R6GSNYsY
+      QNErXGOfAgMBAAECggEBALv0HhoOuybrQyXdETDg/T8DF0yYpBA5m/KelJpb2Pbp
+      aLdZSHz0xDgbktisT3tiWenVlnUtep2MXfwiybUYe2ndb2wnPV4BtY1Yn0R4jsR/
+      QCUH80uStuSlKYfKrFaa5yfD2CzB5ooNnwxUH+dstrSKFLK8LzIdyvJhnyq7Zu9U
+      ZFZRyKRK2EAw3FUlxBzSR9vfaP3Mk2ahOr/NPACeVXGuykm5M4Mv6QFxMHZKgZeM
+      BVHqyv88P3Wuhk4Wemu+DGNduV1mZvfKZaDnIbov94Jf6ZNje5jZEgRShH/ddYD4
+      xBXvVdYlBGh01EJT+bLCr/9MDW6tRf6jBm2YDMB6rKECgYEA8lyfb8RQ1M1xSns4
+      7jw/R8hyM5bQik6YDpJc4Pgz0a6JGIGPzrGokh8NO7Jvacu4mjliRjP+pkiRmNhO
+      +JdpvGMqnYQZXIwyBjvQEu683Qn20lRbzT/+9Yz/xujbT9UDmym3ejglVGH42tCa
+      7bkmJ+w4pKAkQOCxrpUTq3ievScCgYEAyuYDAsi20wUoBWWP6g6Po8gsWv7d627Q
+      CIDBXiGoqUTPuAq4uBC75QgcUZWB1nmxc9ey1uaA8Oc9NYoOdkFFlI/V6wwSmuCw
+      P0xpIcQ4KfEE/v5jAOd85eMx+kv1xiEAfK/X3wBcgDzFXgssVBQP8R+7slnfMHPn
+      gD5boV9jIMkCgYEApsPy9S4JTJRcmxp0zwDnrhYP9s2Ui0aPPJ+bhzViOqq1LQah
+      lGEMlBcHvQcHwK1sRbqsk4/dbj/K53gXxtgw6m71+NLXvKW/Gij4AL8Dd7kOfCWN
+      0YpyfjXaHd1GYwU46QBofpG5pfmQCci2glL/HUNeqnCC4Z16xZ1QnpFt8MsCgYEA
+      vxjFyzB5qOQZXoPaeMrAFLTqucWEBEL5IpkKBntTHCHYNfG7KnlwTnVGHrzebb9u
+      F7oXEXpGBR71smBV4KD3RMX354oWV9K5jNSNzCS/9Riw6O11F5vvMaG7J4+1aqcY
+      i1cezUTM2mbiSQHi/Ulr/mEx6fflUwBHEK0qpiFt/qkCgYAzUmmBLWEtT3DUgCWU
+      B71qTkEM8x/ZmdRxnj1I8SO0qOwmoB0iYRUXry9RXICtg2O7/xVL7zR1slhwIzOK
+      aYXJlQRbwjhiMjrlboQt58mlnTlLbt2UBPqWMARup+6dhsemllG5OVvuPckkhuLf
+      I6NMIh4zG7tkwxnb5Coy3kwUMA==
+      -----END PRIVATE KEY-----
+    certificate: |
+      -----BEGIN CERTIFICATE-----
+      MIID/TCCAuWgAwIBAgIUEmKC/Dz2ECjKe7/nUL0Z3LDBji0wDQYJKoZIhvcNAQEL
+      BQAwgY0xCzAJBgNVBAYTAkJZMQ4wDAYDVQQIDAVNaW5zazEOMAwGA1UEBwwFTWlu
+      c2sxDTALBgNVBAoMBEl0cmExITAfBgNVBAsMGE1pbmlzdHJ5IG9mIFdhdGVyIFNs
+      aWRlczESMBAGA1UEAwwJbG9jYWxob3N0MRgwFgYJKoZIhvcNAQkBFglsb2NhbGhv
+      c3QwHhcNMjExMDA0MTYyMzI0WhcNMjIxMDA0MTYyMzI0WjCBjTELMAkGA1UEBhMC
+      QlkxDjAMBgNVBAgMBU1pbnNrMQ4wDAYDVQQHDAVNaW5zazENMAsGA1UECgwESXRy
+      YTEhMB8GA1UECwwYTWluaXN0cnkgb2YgV2F0ZXIgU2xpZGVzMRIwEAYDVQQDDAls
+      b2NhbGhvc3QxGDAWBgkqhkiG9w0BCQEWCWxvY2FsaG9zdDCCASIwDQYJKoZIhvcN
+      AQEBBQADggEPADCCAQoCggEBAMAW198n7yjlqwkoqQDIfmg6aACCwNLnShIyws3i
+      bGvszebTV+A+WJCsocdK0kG/+KOk0hfrr+ntaSWiDGALLhYvCFV9huY/O9aiVr7f
+      HBW9w9TioIvH5XUrZzuKIvXVPkObXap/I43HC2a/FKtknlE8NuMf104pfZXgDZc1
+      ZcVFkH7J4rr4KxB9TiVACg13dIEB1kOwbcjLca0qs4DV+zfWR45E9FI6GgOFcU1R
+      1iDaSx9NjNwO7VpS9kKbTBd7qpo1l4e7PvMEawYE0tEpE1lzjLxHHeskK1WkCXk7
+      335z1FRfMcSwyc6pYtACrRjpbYU0NXxHoZI1ixhA0StcY58CAwEAAaNTMFEwHQYD
+      VR0OBBYEFDnPzBzW2v+yFuclCsCP34+4Clk1MB8GA1UdIwQYMBaAFDnPzBzW2v+y
+      FuclCsCP34+4Clk1MA8GA1UdEwEB/wQFMAMBAf8wDQYJKoZIhvcNAQELBQADggEB
+      AJc/vxGFCSH9wUHO1P//Hp7JzMwmREUTnOUcvWStv5gZwtor3r7mudShJGv65KYI
+      irwLW7xaRWHWk2EUGDVGBpFmyxd7wyrCFK6ZSa/LgdFrj0/2bH1//ad3UyNKDSNp
+      Ts31r42XCKgZVCDmzyE3G6LuOwStWPmlzsH85LXhVzkh7st5hfjgHefxVEMIUxta
+      8hHCGaO1t/2hroibpPKEbsJp8JIuETUdkUaGAxe9mnJKeMwuVUyQE2GZkxjTn4J3
+      r6IJEtOiUIKDAZDpv2NQmCVsV/LUDtAZyNHeBx9pD7MOky6SO9oRo01k2rIXORpE
+      NWTt8KKWAZA9Ee35/XZnLBM=
+      -----END CERTIFICATE-----
+
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: example1
+spec:
+  selector:
+    k8s-app: example
+  ports:
+  - port: 80
+    targetPort: 8080
+---
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: example1
+  labels:
+    k8s-app: example
+spec:
+  selector:
+    matchLabels:
+      k8s-app: example
+  template:
+    metadata:
+      labels:
+        k8s-app: example
+    spec:
+      containers:
+      - image: openshift/deployment-example:v1
+        name: web
+        ports:
+        - containerPort: 8080

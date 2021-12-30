@@ -1,0 +1,59 @@
+apiVersion: kibana.k8s.elastic.co/v1
+kind: Kibana
+metadata:
+  name: kibana-sample
+spec:
+  version: 7.15.0
+  count: 1
+  elasticsearchRef:
+    name: "elasticsearch-sample"
+  podTemplate:
+    spec:
+      containers:
+      - name: kibana
+        resources:
+          limits:
+            memory: 1Gi
+            cpu: 1
+---
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: example
+spec:
+  host: example.local
+  wildcardPolicy: None
+  to:
+    name: example1
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: example
+spec:
+  selector:
+    k8s-app: example
+  ports:
+  - port: 80
+    targetPort: 8080
+---
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: example
+  labels:
+    k8s-app: example
+spec:
+  selector:
+    matchLabels:
+      k8s-app: example
+  template:
+    metadata:
+      labels:
+        k8s-app: example
+    spec:
+      containers:
+      - image: openshift/deployment-example:v1
+        name: web
+        ports:
+        - containerPort: 8080

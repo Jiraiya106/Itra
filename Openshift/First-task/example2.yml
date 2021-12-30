@@ -1,0 +1,147 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+labels:
+  template: httpd-hello-world
+metadata:
+  name: app
+  annotations:
+    haproxy.router.openshift.io/hsts_header: max-age=31536000
+objects:
+- apiVersion: build.openshift.io/v1
+  kind: BuildConfig
+  metadata:
+    labels:
+      app: app
+      app.kubernetes.io/component: app
+      app.kubernetes.io/instance: app
+    name: app
+  spec:
+    output:
+      to:
+        kind: ImageStreamTag
+        name: app:latest
+    source:
+      contextDir: httpd-hello-world
+      git:
+        uri: https://github.com/monodot/container-up
+      type: Git
+    strategy:
+      dockerStrategy:
+        dockerfilePath: Dockerfile.openshift
+        from:
+          kind: ImageStreamTag
+          name: httpd:2.4
+          namespace: openshift
+      type: Docker
+    triggers:
+    - type: ImageChange
+- apiVersion: image.openshift.io/v1
+  kind: ImageStream
+  metadata:
+    labels:
+      app: app
+      app.kubernetes.io/component: app
+      app.kubernetes.io/instance: app
+    name: app
+- apiVersion: route.openshift.io/v1
+  kind: Route
+  metadata:
+    labels:
+      app: app
+      app.kubernetes.io/component: app
+      app.kubernetes.io/instance: app
+    name: app
+  spec:
+    port:
+      targetPort: 8080-tcp
+    to:
+      kind: Service
+      name: app
+      weight: 100
+    wildcardPolicy: None
+- apiVersion: apps.openshift.io/v1
+  kind: DeploymentConfig
+  metadata:
+    labels:
+      app: app
+      app.kubernetes.io/component: app
+      app.kubernetes.io/instance: app
+    name: app
+  spec:
+    replicas: 1
+    selector:
+      deploymentconfig: app
+    strategy:
+      type: Rolling
+    template:
+      metadata:
+        labels:
+          deploymentconfig: app
+      spec:
+        containers:
+        - image: app
+          imagePullPolicy: Always
+          name: app
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+          - containerPort: 8443
+            protocol: TCP
+        restartPolicy: Always
+    triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - app
+        from:
+          kind: ImageStreamTag
+          name: app:latest
+      type: ImageChange
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      app: app
+      app.kubernetes.io/component: app
+      app.kubernetes.io/instance: app
+    name: app
+  spec:
+    ports:
+    - name: 8080-tcp
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+    - name: 8443-tcp
+      port: 8443
+      protocol: TCP
+      targetPort: 8443
+    selector:
+      deploymentconfig: app
+    type: ClusterIP
+parameters:
+- description: Name that will be given to all the resources
+  displayName: Name
+  name: NAME
+  required: true
+  value: mywebsite
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: app
+  annotations:
+    route.openshift.io/termination: "reencrypt" 
+spec:
+  rules:
+  - host: www.example.com
+    http:
+      paths:
+      - backend:
+          serviceName: app
+          servicePort: 443
+        pathType: ImplementationSpecific
+  tls:
+  - hosts:
+    - www.example.com
+    secretName: example-com-tls-certificate
