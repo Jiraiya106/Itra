@@ -21,3 +21,7 @@ EKS/learn-terraform-provision-eks-cluster1/.terraform
 EKS/learn-terraform-provision-eks-cluster1/.terraform.lock.hcl
 EKS/learn-terraform-provision-eks-cluster1/terraform.tfvars
 EKS/learn-terraform-provision-eks-cluster1/terraform.tfstate.backup
+EKS/terragrunt/stage/us-east-2/eks/.terragrunt-cache/
+EKS/terragrunt/stage/us-east-2/eks/.terraform.lock.hcl
+EKS/terragrunt/stage/us-east-2/vpc/.terragrunt-cache/
+EKS/terragrunt/stage/us-east-2/vpc/.terraform.lock.hcl
