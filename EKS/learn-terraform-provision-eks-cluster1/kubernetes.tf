@@ -36,19 +36,12 @@ resource "kubernetes_deployment" "test" {
       }
       spec {
         container {
-          image = "225050420367.dkr.ecr.us-west-2.amazonaws.com/nginx:nginx"
+          image = "225050420367.dkr.ecr.us-west-2.amazonaws.com/task:nginxpy"
           name  = "nginx-container"
           port {
             container_port = 80
           }
         }
-        # container {
-        #   image = "225050420367.dkr.ecr.us-west-2.amazonaws.com/task:nginxpy"
-        #   name = "app"
-        #   port {
-        #     container_port = 8000
-        #   }
-        #}
       }
     }
   }
@@ -62,9 +55,8 @@ resource "kubernetes_service" "test" {
     selector = {
       app = kubernetes_deployment.test.spec.0.template.0.metadata.0.labels.app
     }
-    type = "NodePort"
+    type = "LoadBalancer"
     port {
-      node_port   = 30201
       port        = 80
       target_port = 80
     }
@@ -90,15 +82,8 @@ resource "kubernetes_deployment" "app" {
         }
       }
       spec {
-        # container {
-        #   image = "225050420367.dkr.ecr.us-west-2.amazonaws.com/nginx:nginx"
-        #   name  = "nginx-container"
-        #   port {
-        #     container_port = 80
-        #   }
-        # }
         container {
-          image = "225050420367.dkr.ecr.us-west-2.amazonaws.com/task:nginxpy"
+          image = "225050420367.dkr.ecr.us-west-2.amazonaws.com/task:apppy"
           name = "app"
           port {
             container_port = 8000
@@ -117,9 +102,8 @@ resource "kubernetes_service" "app" {
     selector = {
       app = kubernetes_deployment.app.spec.0.template.0.metadata.0.labels.app
     }
-    type = "NodePort"
+    type = "LoadBalancer"
     port {
-      node_port   = 30501
       port        = 8000
       target_port = 8000
     }

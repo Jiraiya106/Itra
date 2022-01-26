@@ -35,27 +35,38 @@ inputs = {
   cluster_version = "1.21"
 
   vpc_id  = dependency.vpc.outputs.vpc_id
-  subnets = dependency.vpc.outputs.private_subnets
+  subnets = dependency.vpc.outputs.public_subnets
+  cluster_endpoint_private_access = true
+  cluster_endpoint_public_access  = true
+  # worker_groups = [
+  #   {
+  #     name                          = "spot-group"
+  #     instance_type                 = "t2.micro"
+  #     spot_max_price                = "0.04"
+  #     spot_price                    = "0.02"
+  #     asg_desired_capacity          = 1
+  #     asg_max_size                  = 1
+  #     kubelet_extra_args            = "--node-labels=node.kubernetes.io/lifecycle=spot"
+  #   },
+  #   {
+  #     name                 = "on-demand-group"
+  #     instance_type        = "t2.micro"
+  #     asg_desired_capacity = 1
+  #     asg_max_size         = 1
+  #     kubelet_extra_args   = "--node-labels=node.kubernetes.io/lifecycle=spot"
+  #   }
+  # ]
 
-  worker_groups = [
-    {
-      name                          = "spot-group"
-      instance_type                 = "t2.micro"
-      spot_max_price                = "0.04"
-      spot_price                    = "0.02"
-      asg_desired_capacity          = 1
-      asg_max_size                  = 1
-      kubelet_extra_args            = "--node-labels=node.kubernetes.io/lifecycle=spot"
-    },
-    {
-      name                 = "on-demand-group"
-      instance_type        = "t2.micro"
-      asg_desired_capacity = 1
-      asg_max_size         = 1
-      kubelet_extra_args   = "--node-labels=node.kubernetes.io/lifecycle=spot"
+    node_groups = {
+    first = {
+      name             = "example"
+      desired_capacity = 1
+      max_capacity     = 10
+      min_capacity     = 1
+
+      instance_type = "t2.micro"
     }
-  ]
-
+  }
 }
 
 generate "provider-local" {
@@ -121,11 +132,10 @@ resource "kubernetes_service" "test" {
     selector = {
       app = kubernetes_deployment.test.spec.0.template.0.metadata.0.labels.app
     }
-    type = "ClusterIP"
+    type = "LoadBalancer"
     port {
-      #node_port   = 30201
       port        = 80
-      #target_port = 80
+      target_port = 80
     }
   }
 }
@@ -169,11 +179,10 @@ resource "kubernetes_service" "app" {
     selector = {
       app = kubernetes_deployment.app.spec.0.template.0.metadata.0.labels.app
     }
-    type = "ClusterIP"
+    type = "LoadBalancer"
     port {
-      #node_port   = 30501
       port        = 8000
-      #target_port = 8000
+      target_port = 8000
     }
   }
 }
