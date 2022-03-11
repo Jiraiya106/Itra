@@ -1,0 +1,10 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+metadata:
+  name: example-eks
+  region: us-west-2
+managedNodeGroups:
+- name: node-group-lt
+  # launchTemplate:
+  #   id: lt-id
+  #   version: "1"

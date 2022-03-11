@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: accounting-web #this will become the DNS name in the cluster
+spec:
+  type:  LoadBalancer
+  selector:
+    app: accounting-web #pod selector
+  ports:   
+  - port: 8000 #service listen port
+    targetPort: 8000 #target port on pod
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: accounting-web
+spec:
+  selector:
+    matchLabels:
+      app: accounting-web #this connect deployment with pod spec
+  template:
+    metadata:
+      labels:
+        app: accounting-web #every pod created with this deployment, will have this label, and that how service will target pod for network traffic
+    spec:     
+      containers:    
+      - name: accounting-web-ctr
+        image: 225050420367.dkr.ecr.us-west-2.amazonaws.com/task:apppy
+        ports:
+        - containerPort: 8000

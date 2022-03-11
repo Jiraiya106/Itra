@@ -16,3 +16,17 @@ Beanstalk-ECS/Beanstalk/django
 Linux/First_task/123
 Linux/First_task/456
 Linux/First_task/error.sh
+EKS/terraform/.terraform
+EKS/terraform/.terraform.lock.hcl
+EKS/learn-terraform-provision-eks-cluster1/.terraform
+EKS/learn-terraform-provision-eks-cluster1/.terraform.lock.hcl
+EKS/learn-terraform-provision-eks-cluster1/terraform.tfvars
+EKS/learn-terraform-provision-eks-cluster1/terraform.tfstate.backup
+EKS/terragrunt/stage/us-east-2/eks/.terragrunt-cache/
+EKS/terragrunt/stage/us-east-2/eks/.terraform.lock.hcl
+EKS/terragrunt/stage/us-east-2/vpc/.terragrunt-cache/
+EKS/terragrunt/stage/us-east-2/vpc/.terraform.lock.hcl
+EKS/terragrunt/stage/us-east-2/eks/.terragrunt-cache/fkBJ7N6vpduwE4EM5S1JhgCrGm0/98CuXP4mW5gfFUTFyr-GKJuFrn8
+EKS/terragrunt/stage/us-east-2/eks/.terragrunt-cache/uvzLnsXCxFO15lAKNeVf0s8RnxE/98CuXP4mW5gfFUTFyr-GKJuFrn8
+EKS/terragrunt/stage/us-east-2/vpc/.terragrunt-cache/G1hP1a7jLoOo-Pj56TbB-Eiv8W0/ThyYwttwki6d6AS3aD5OwoyqIWA
+EKS/terragrunt/stage/us-east-2/vpc/.terragrunt-cache/pzjyx0V45HtaWDezy4KMMIEUs8s/ThyYwttwki6d6AS3aD5OwoyqIWA
